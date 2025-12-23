@@ -33,10 +33,8 @@ class WatchlistView extends StatelessWidget {
       body: BlocBuilder<WatchlistBloc, WatchlistState>(
         builder: (context, state) {
           return switch (state) {
-            WatchlistInitial() => const SizedBox.shrink(),
-            WatchlistLoading() => const Center(
-                child: CircularProgressIndicator(),
-              ),
+            WatchlistInitial() => const WatchlistSkeleton(),
+            WatchlistLoading() => const WatchlistSkeleton(),
             WatchlistError(:final message) => Center(
                 child: Padding(
                   padding: const EdgeInsets.all(24),
