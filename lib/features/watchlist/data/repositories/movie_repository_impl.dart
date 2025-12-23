@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:dartz/dartz.dart';
 
 import '../../../../core/error/exceptions.dart';
@@ -30,19 +32,25 @@ class MovieRepositoryImpl implements MovieRepository {
       final remoteMovies = await remoteDataSource.getMcuMovies();
       await localDataSource.cacheMovies(remoteMovies);
       return Right(remoteMovies);
+    } on SocketException {
+      return _fallbackToCache('No internet connection');
     } on ServerException catch (e) {
-      try {
-        final cachedMovies = await localDataSource.getCachedMovies();
-        if (cachedMovies.isNotEmpty) {
-          return Right(cachedMovies);
-        }
-      } catch (_) {}
-      return Left(ServerFailure(e.message));
+      return _fallbackToCache(e.message);
     } on CacheException catch (e) {
       return Left(CacheFailure(e.message));
     } catch (e) {
-      return Left(ServerFailure(e.toString()));
+      return _fallbackToCache('Something went wrong');
     }
+  }
+
+  Future<Either<Failure, List<Movie>>> _fallbackToCache(String errorMessage) async {
+    try {
+      final cachedMovies = await localDataSource.getCachedMovies();
+      if (cachedMovies.isNotEmpty) {
+        return Right(cachedMovies);
+      }
+    } catch (_) {}
+    return Left(NetworkFailure(errorMessage));
   }
 
   Future<void> _refreshFromRemote() async {

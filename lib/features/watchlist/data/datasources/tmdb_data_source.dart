@@ -1,4 +1,6 @@
+import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
@@ -14,6 +16,7 @@ abstract class TmdbDataSource {
 class TmdbDataSourceImpl implements TmdbDataSource {
   final http.Client client;
   static const _baseUrl = 'https://api.themoviedb.org/3';
+  static const _timeout = Duration(seconds: 10);
 
   TmdbDataSourceImpl({required this.client});
 
@@ -21,6 +24,10 @@ class TmdbDataSourceImpl implements TmdbDataSource {
 
   @override
   Future<List<Movie>> getMcuMovies() async {
+    if (_apiKey.isEmpty) {
+      throw const ServerException('TMDB API key not configured');
+    }
+
     final movies = <Movie>[];
 
     for (final movieData in McuMovieData.mcuMovies) {
@@ -34,13 +41,17 @@ class TmdbDataSourceImpl implements TmdbDataSource {
           );
           movies.add(enrichedMovie);
         }
+      } on SocketException {
+        throw const ServerException('No internet connection');
+      } on http.ClientException {
+        continue;
       } catch (_) {
         continue;
       }
     }
 
     if (movies.isEmpty) {
-      throw const ServerException('Failed to fetch MCU movies');
+      throw const ServerException('Failed to fetch movies. Check your connection.');
     }
 
     movies.sort((a, b) => a.order.compareTo(b.order));
@@ -48,24 +59,28 @@ class TmdbDataSourceImpl implements TmdbDataSource {
   }
 
   Future<Movie?> _fetchMovieDetails(int movieId) async {
-    final response = await client.get(
-      Uri.parse('$_baseUrl/movie/$movieId?api_key=$_apiKey'),
-    );
+    try {
+      final response = await client
+          .get(Uri.parse('$_baseUrl/movie/$movieId?api_key=$_apiKey'))
+          .timeout(_timeout);
 
-    if (response.statusCode == 200) {
-      final json = jsonDecode(response.body) as Map<String, dynamic>;
-      return Movie(
-        id: json['id'] as int,
-        title: json['title'] as String,
-        runtime: json['runtime'] as int? ?? 0,
-        posterPath: json['poster_path'] as String?,
-        overview: json['overview'] as String?,
-        releaseDate: json['release_date'] as String? ?? '',
-        phase: 1,
-        watchPaths: [],
-        order: 0,
-      );
+      if (response.statusCode == 200) {
+        final json = jsonDecode(response.body) as Map<String, dynamic>;
+        return Movie(
+          id: json['id'] as int,
+          title: json['title'] as String,
+          runtime: json['runtime'] as int? ?? 0,
+          posterPath: json['poster_path'] as String?,
+          overview: json['overview'] as String?,
+          releaseDate: json['release_date'] as String? ?? '',
+          phase: 1,
+          watchPaths: [],
+          order: 0,
+        );
+      }
+      return null;
+    } on TimeoutException {
+      return null;
     }
-    return null;
   }
 }
