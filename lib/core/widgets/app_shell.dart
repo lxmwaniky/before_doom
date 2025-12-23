@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../features/countdown/presentation/pages/countdown_page.dart';
-import '../features/watchlist/presentation/pages/watchlist_page.dart';
+import '../../features/countdown/presentation/pages/countdown_page.dart';
+import '../../features/watchlist/presentation/pages/watchlist_page.dart';
 
 class AppShell extends StatefulWidget {
   const AppShell({super.key});
@@ -13,7 +13,7 @@ class AppShell extends StatefulWidget {
 class _AppShellState extends State<AppShell> {
   int _currentIndex = 0;
 
-  final _pages = const [
+  final _pages = const <Widget>[
     CountdownPage(),
     WatchlistPage(),
   ];
