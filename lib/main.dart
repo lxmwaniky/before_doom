@@ -18,7 +18,8 @@ void main() async {
 
   await initDependencies();
 
-  await NotificationService().init();
+  // Non-blocking - notifications are optional
+  NotificationService().init();
 
   runApp(const BeforeDoomApp());
 }

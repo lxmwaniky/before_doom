@@ -1,31 +1,60 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
 class HapticService {
   static void lightTap() {
-    HapticFeedback.lightImpact();
+    try {
+      HapticFeedback.lightImpact();
+    } catch (e) {
+      debugPrint('HapticService.lightTap failed: $e');
+    }
   }
 
   static void mediumTap() {
-    HapticFeedback.mediumImpact();
+    try {
+      HapticFeedback.mediumImpact();
+    } catch (e) {
+      debugPrint('HapticService.mediumTap failed: $e');
+    }
   }
 
   static void heavyTap() {
-    HapticFeedback.heavyImpact();
+    try {
+      HapticFeedback.heavyImpact();
+    } catch (e) {
+      debugPrint('HapticService.heavyTap failed: $e');
+    }
   }
 
   static void success() {
-    HapticFeedback.mediumImpact();
+    try {
+      HapticFeedback.mediumImpact();
+    } catch (e) {
+      debugPrint('HapticService.success failed: $e');
+    }
   }
 
   static void missionComplete() {
-    HapticFeedback.heavyImpact();
+    try {
+      HapticFeedback.heavyImpact();
+    } catch (e) {
+      debugPrint('HapticService.missionComplete failed: $e');
+    }
   }
 
   static void selection() {
-    HapticFeedback.selectionClick();
+    try {
+      HapticFeedback.selectionClick();
+    } catch (e) {
+      debugPrint('HapticService.selection failed: $e');
+    }
   }
 
   static void rankUp() {
-    HapticFeedback.heavyImpact();
+    try {
+      HapticFeedback.heavyImpact();
+    } catch (e) {
+      debugPrint('HapticService.rankUp failed: $e');
+    }
   }
 }

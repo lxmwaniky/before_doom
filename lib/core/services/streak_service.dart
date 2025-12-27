@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:hive/hive.dart';
 
 abstract class StreakService {
@@ -15,61 +16,75 @@ class StreakServiceImpl implements StreakService {
 
   @override
   Future<int> getCurrentStreak() async {
-    final box = await _box;
-    final lastWatchDate = await getLastWatchDate();
+    try {
+      final box = await _box;
+      final lastWatchDate = await getLastWatchDate();
 
-    if (lastWatchDate == null) return 0;
+      if (lastWatchDate == null) return 0;
 
-    final now = DateTime.now();
-    final today = DateTime(now.year, now.month, now.day);
-    final lastWatch =
-        DateTime(lastWatchDate.year, lastWatchDate.month, lastWatchDate.day);
+      final now = DateTime.now();
+      final today = DateTime(now.year, now.month, now.day);
+      final lastWatch =
+          DateTime(lastWatchDate.year, lastWatchDate.month, lastWatchDate.day);
 
-    final difference = today.difference(lastWatch).inDays;
+      final difference = today.difference(lastWatch).inDays;
 
-    if (difference > 1) {
-      await box.put(_streakKey, 0);
+      if (difference > 1) {
+        await box.put(_streakKey, 0);
+        return 0;
+      }
+
+      return box.get(_streakKey, defaultValue: 0) as int;
+    } catch (e) {
+      debugPrint('StreakService.getCurrentStreak failed: $e');
       return 0;
     }
-
-    return box.get(_streakKey, defaultValue: 0) as int;
   }
 
   @override
   Future<void> recordWatchActivity() async {
-    final box = await _box;
-    final now = DateTime.now();
-    final today = DateTime(now.year, now.month, now.day);
+    try {
+      final box = await _box;
+      final now = DateTime.now();
+      final today = DateTime(now.year, now.month, now.day);
 
-    final lastWatchDate = await getLastWatchDate();
+      final lastWatchDate = await getLastWatchDate();
 
-    if (lastWatchDate != null) {
-      final lastWatch =
-          DateTime(lastWatchDate.year, lastWatchDate.month, lastWatchDate.day);
-      final difference = today.difference(lastWatch).inDays;
+      if (lastWatchDate != null) {
+        final lastWatch = DateTime(
+            lastWatchDate.year, lastWatchDate.month, lastWatchDate.day);
+        final difference = today.difference(lastWatch).inDays;
 
-      if (difference == 0) {
-        return;
-      } else if (difference == 1) {
-        final currentStreak = box.get(_streakKey, defaultValue: 0) as int;
-        await box.put(_streakKey, currentStreak + 1);
+        if (difference == 0) {
+          return;
+        } else if (difference == 1) {
+          final currentStreak = box.get(_streakKey, defaultValue: 0) as int;
+          await box.put(_streakKey, currentStreak + 1);
+        } else {
+          await box.put(_streakKey, 1);
+        }
       } else {
         await box.put(_streakKey, 1);
       }
-    } else {
-      await box.put(_streakKey, 1);
-    }
 
-    await box.put(_lastWatchKey, now.toIso8601String());
+      await box.put(_lastWatchKey, now.toIso8601String());
+    } catch (e) {
+      debugPrint('StreakService.recordWatchActivity failed: $e');
+    }
   }
 
   @override
   Future<DateTime?> getLastWatchDate() async {
-    final box = await _box;
-    final dateStr = box.get(_lastWatchKey) as String?;
+    try {
+      final box = await _box;
+      final dateStr = box.get(_lastWatchKey) as String?;
 
-    if (dateStr == null) return null;
+      if (dateStr == null) return null;
 
-    return DateTime.tryParse(dateStr);
+      return DateTime.tryParse(dateStr);
+    } catch (e) {
+      debugPrint('StreakService.getLastWatchDate failed: $e');
+      return null;
+    }
   }
 }

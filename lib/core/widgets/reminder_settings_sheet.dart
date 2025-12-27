@@ -36,56 +36,100 @@ class _ReminderSettingsSheetState extends State<ReminderSettingsSheet> {
   }
 
   Future<void> _toggleReminder(bool enabled) async {
-    if (enabled) {
-      final granted = await _notificationService.requestPermission();
-      if (!granted) {
-        if (mounted) {
+    try {
+      if (enabled) {
+        final granted = await _notificationService.requestPermission();
+        if (!granted) {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Please enable notifications in settings'),
+              ),
+            );
+          }
+          return;
+        }
+
+        final success = await _notificationService.scheduleDailyReminder(
+          hour: _selectedTime.hour,
+          minute: _selectedTime.minute,
+          nextMovieTitle: widget.nextMovieTitle,
+        );
+
+        if (!success && mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text('Please enable notifications in settings'),
+              content: Text('Failed to schedule reminder'),
             ),
           );
+          return;
         }
-        return;
+      } else {
+        await _notificationService.cancelReminder();
       }
 
-      await _notificationService.scheduleDailyReminder(
-        hour: _selectedTime.hour,
-        minute: _selectedTime.minute,
-        nextMovieTitle: widget.nextMovieTitle,
-      );
-    } else {
-      await _notificationService.cancelReminder();
+      setState(() => _isEnabled = enabled);
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Something went wrong')),
+        );
+      }
     }
-
-    setState(() => _isEnabled = enabled);
   }
 
   Future<void> _pickTime() async {
-    final picked = await showTimePicker(
-      context: context,
-      initialTime: _selectedTime,
-    );
+    try {
+      final picked = await showTimePicker(
+        context: context,
+        initialTime: _selectedTime,
+      );
 
-    if (picked != null) {
-      setState(() => _selectedTime = picked);
+      if (picked != null) {
+        setState(() => _selectedTime = picked);
 
-      if (_isEnabled) {
-        await _notificationService.scheduleDailyReminder(
-          hour: picked.hour,
-          minute: picked.minute,
-          nextMovieTitle: widget.nextMovieTitle,
+        if (_isEnabled) {
+          final success = await _notificationService.scheduleDailyReminder(
+            hour: picked.hour,
+            minute: picked.minute,
+            nextMovieTitle: widget.nextMovieTitle,
+          );
+
+          if (!success && mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Failed to update reminder time')),
+            );
+          }
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Something went wrong')),
         );
       }
     }
   }
 
   Future<void> _sendTestNotification() async {
-    await _notificationService.showTestNotification();
-    if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Test notification sent!')),
-    );
+    try {
+      final success = await _notificationService.showTestNotification();
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            success ? 'Test notification sent!' : 'Notifications unavailable',
+          ),
+        ),
+      );
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Failed to send test notification')),
+        );
+      }
+    }
   }
 
   @override
