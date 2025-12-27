@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -11,6 +12,7 @@ import '../bloc/watchlist_bloc.dart';
 import '../bloc/watchlist_event.dart';
 import '../bloc/watchlist_state.dart';
 import '../widgets/widgets.dart';
+import 'item_detail_page.dart';
 
 class WatchlistPage extends StatelessWidget {
   const WatchlistPage({super.key});
@@ -33,8 +35,8 @@ class WatchlistView extends StatefulWidget {
 
 class _WatchlistViewState extends State<WatchlistView> {
   final _searchController = TextEditingController();
-  final _shareCardKey = GlobalKey();
   String _searchQuery = '';
+  bool _isGridView = false;
 
   @override
   void dispose() {
@@ -50,7 +52,13 @@ class _WatchlistViewState extends State<WatchlistView> {
       appBar: AppBar(
         title: const Text('MCU Watchlist'),
         actions: [
-          BlocBuilder<WatchlistBloc, WatchlistState>(            builder: (context, state) {
+          IconButton(
+            icon: Icon(_isGridView ? Icons.view_list : Icons.grid_view),
+            onPressed: () => setState(() => _isGridView = !_isGridView),
+            tooltip: _isGridView ? 'List view' : 'Grid view',
+          ),
+          BlocBuilder<WatchlistBloc, WatchlistState>(
+            builder: (context, state) {
               if (state is WatchlistLoaded) {
                 return _buildProfileButton(context, state.progress);
               }
@@ -137,7 +145,9 @@ class _WatchlistViewState extends State<WatchlistView> {
                       );
                 },
                 child: _searchQuery.isEmpty
-                    ? _buildNormalList(context, progress, streak, items, itemsByMonth)
+                    ? (_isGridView
+                        ? _buildGridView(context, progress, streak, items, itemsByMonth)
+                        : _buildNormalList(context, progress, streak, items, itemsByMonth))
                     : _buildSearchResults(context, items),
               ),
           };
@@ -171,6 +181,185 @@ class _WatchlistViewState extends State<WatchlistView> {
           child: SizedBox(height: 16),
         ),
       ],
+    );
+  }
+
+  Widget _buildGridView(
+    BuildContext context,
+    WatchProgress progress,
+    int streak,
+    List<WatchlistItem> items,
+    Map<String, List<WatchlistItem>> itemsByMonth,
+  ) {
+    return CustomScrollView(
+      slivers: [
+        SliverToBoxAdapter(
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: ProgressHeader(
+              progress: progress,
+              streak: streak,
+              scheduleStatus: _calculateScheduleStatus(items),
+            ),
+          ),
+        ),
+        for (final entry in itemsByMonth.entries)
+          ..._buildGridMonthSection(context, entry.key, entry.value, items),
+        const SliverToBoxAdapter(
+          child: SizedBox(height: 16),
+        ),
+      ],
+    );
+  }
+
+  List<Widget> _buildGridMonthSection(
+    BuildContext context,
+    String month,
+    List<WatchlistItem> monthItems,
+    List<WatchlistItem> allItems,
+  ) {
+    final theme = Theme.of(context);
+    final monthLabel = _formatMonth(month);
+
+    return [
+      SliverToBoxAdapter(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+          child: Text(
+            monthLabel,
+            style: theme.textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.8),
+            ),
+          ),
+        ),
+      ),
+      SliverPadding(
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        sliver: SliverGrid(
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 3,
+            mainAxisSpacing: 8,
+            crossAxisSpacing: 8,
+            childAspectRatio: 0.65,
+          ),
+          delegate: SliverChildBuilderDelegate(
+            (context, index) {
+              final item = monthItems[index];
+              return _buildGridTile(context, item, allItems);
+            },
+            childCount: monthItems.length,
+          ),
+        ),
+      ),
+    ];
+  }
+
+  Widget _buildGridTile(
+    BuildContext context,
+    WatchlistItem item,
+    List<WatchlistItem> allItems,
+  ) {
+    final theme = Theme.of(context);
+
+    return GestureDetector(
+      onTap: () => Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => BlocProvider.value(
+            value: context.read<WatchlistBloc>(),
+            child: ItemDetailPage(
+              item: item,
+              allItems: allItems,
+              onToggle: () {
+                context.read<WatchlistBloc>().add(
+                      WatchlistItemToggled(
+                        key: item.uniqueKey,
+                        isWatched: !item.isWatched,
+                      ),
+                    );
+              },
+              onEpisodesChanged: item.isTvShow
+                  ? (episodes) {
+                      context.read<WatchlistBloc>().add(
+                            WatchlistEpisodesUpdated(
+                              key: item.uniqueKey,
+                              episodesWatched: episodes,
+                            ),
+                          );
+                    }
+                  : null,
+            ),
+          ),
+        ),
+      ),
+      child: Stack(
+        children: [
+          ClipRRect(
+            borderRadius: BorderRadius.circular(8),
+            child: item.posterPath != null
+                ? CachedNetworkImage(
+                    imageUrl: 'https://image.tmdb.org/t/p/w300${item.posterPath}',
+                    fit: BoxFit.cover,
+                    width: double.infinity,
+                    height: double.infinity,
+                  )
+                : Container(
+                    color: theme.colorScheme.surfaceContainerHighest,
+                    child: Center(
+                      child: Icon(
+                        Icons.movie,
+                        color: theme.colorScheme.onSurface.withValues(alpha: 0.3),
+                      ),
+                    ),
+                  ),
+          ),
+          if (item.isWatched)
+            Positioned.fill(
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8),
+                  color: Colors.black.withValues(alpha: 0.5),
+                ),
+                child: Icon(
+                  Icons.check_circle,
+                  color: theme.colorScheme.primary,
+                  size: 32,
+                ),
+              ),
+            ),
+          Positioned(
+            bottom: 0,
+            left: 0,
+            right: 0,
+            child: Container(
+              padding: const EdgeInsets.all(4),
+              decoration: BoxDecoration(
+                borderRadius: const BorderRadius.vertical(
+                  bottom: Radius.circular(8),
+                ),
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Colors.transparent,
+                    Colors.black.withValues(alpha: 0.8),
+                  ],
+                ),
+              ),
+              child: Text(
+                item.title,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: theme.textTheme.labelSmall?.copyWith(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -534,6 +723,8 @@ class _WatchlistViewState extends State<WatchlistView> {
   }
 
   void _showShareSheet(BuildContext context, WatchProgress progress, int daysRemaining) {
+    final shareKey = GlobalKey();
+    
     showModalBottomSheet(
       context: context,
       backgroundColor: Theme.of(context).colorScheme.surface,
@@ -541,7 +732,7 @@ class _WatchlistViewState extends State<WatchlistView> {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      builder: (_) => Padding(
+      builder: (sheetContext) => Padding(
         padding: const EdgeInsets.all(24),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -550,7 +741,7 @@ class _WatchlistViewState extends State<WatchlistView> {
               width: 40,
               height: 4,
               decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.2),
+                color: Theme.of(sheetContext).colorScheme.onSurface.withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
@@ -558,14 +749,14 @@ class _WatchlistViewState extends State<WatchlistView> {
             ShareProgressCard(
               progress: progress,
               daysRemaining: daysRemaining,
-              repaintKey: _shareCardKey,
+              repaintKey: shareKey,
             ),
             const SizedBox(height: 24),
             SizedBox(
               width: double.infinity,
               child: FilledButton.icon(
                 onPressed: () async {
-                  await ShareService.shareProgress(repaintKey: _shareCardKey);
+                  await ShareService.shareProgress(repaintKey: shareKey);
                 },
                 icon: const Icon(Icons.share),
                 label: const Text('Share Progress'),

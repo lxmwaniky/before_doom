@@ -215,12 +215,25 @@ class CountdownView extends StatelessWidget {
   Widget _buildDoomsdayArrived(ThemeData theme) {
     return Column(
       children: [
-        Icon(
-          Icons.celebration,
-          size: 80,
-          color: theme.colorScheme.primary,
+        Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            gradient: RadialGradient(
+              colors: [
+                theme.colorScheme.primary.withValues(alpha: 0.3),
+                theme.colorScheme.primary.withValues(alpha: 0.1),
+                Colors.transparent,
+              ],
+            ),
+          ),
+          child: Icon(
+            Icons.movie_filter,
+            size: 64,
+            color: theme.colorScheme.primary,
+          ),
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 24),
         Text(
           'DOOMSDAY',
           style: theme.textTheme.displaySmall?.copyWith(
@@ -230,11 +243,37 @@ class CountdownView extends StatelessWidget {
           ),
         ),
         Text(
-          'IS HERE',
+          'HAS ARRIVED',
           style: theme.textTheme.headlineMedium?.copyWith(
             color: theme.colorScheme.secondary,
             fontWeight: FontWeight.w300,
             letterSpacing: 6,
+          ),
+        ),
+        const SizedBox(height: 32),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+          decoration: BoxDecoration(
+            color: theme.colorScheme.surfaceContainerHighest,
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Column(
+            children: [
+              Text(
+                'Your journey continues...',
+                style: theme.textTheme.bodyLarge?.copyWith(
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.8),
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Track your rewatches, discover post-credits scenes,\nand prepare for what comes next.',
+                textAlign: TextAlign.center,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                ),
+              ),
+            ],
           ),
         ),
       ],

@@ -53,9 +53,7 @@ class NotificationService {
     }
   }
 
-  void _onNotificationTapped(NotificationResponse response) {
-    // Handle notification tap - could navigate to watchlist
-  }
+  void _onNotificationTapped(NotificationResponse response) {}
 
   Future<bool> requestPermission() async {
     try {

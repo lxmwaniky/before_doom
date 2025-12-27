@@ -2,35 +2,35 @@ import '../../features/watchlist/domain/entities/movie.dart';
 import '../constants/app_constants.dart';
 
 class ScheduleCalculator {
-  /// Calculates dynamic target months for items based on current date
-  /// and distributes unwatched items evenly until Doomsday
   static List<WatchlistItem> assignDynamicSchedule(List<WatchlistItem> items) {
     final now = DateTime.now();
     final doomsday = AppConstants.doomsdayDate;
 
-    // If we're past Doomsday, just return items as-is
     if (now.isAfter(doomsday)) return items;
 
-    // Calculate months remaining (including current month)
     final monthsRemaining = _monthsBetween(now, doomsday);
     if (monthsRemaining <= 0) return items;
 
-    // Separate watched and unwatched items
     final watchedItems = items.where((i) => i.isWatched).toList();
     final unwatchedItems = items.where((i) => !i.isWatched).toList();
 
-    // Assign watched items to current month (they're done)
     final currentMonth = _formatMonth(now);
     final result = watchedItems.map((item) {
       return item.copyWith(targetMonth: currentMonth);
     }).toList();
 
-    // Distribute unwatched items evenly across remaining months
     if (unwatchedItems.isEmpty) return result;
 
-    final itemsPerMonth = (unwatchedItems.length / monthsRemaining).ceil();
+    final totalMinutes = unwatchedItems.fold(0, (sum, i) => sum + i.runtime);
+    final minutesPerMonth = (totalMinutes / monthsRemaining).ceil();
+
+    final daysLeftInMonth = _daysLeftInCurrentMonth(now);
+    final currentMonthFraction = daysLeftInMonth / 30.0;
+    final currentMonthBudget = (minutesPerMonth * currentMonthFraction).floor();
+
     var monthOffset = 0;
-    var itemsInCurrentMonth = 0;
+    var minutesInCurrentMonth = 0;
+    var currentBudget = currentMonthBudget;
 
     for (final item in unwatchedItems) {
       final targetDate = DateTime(now.year, now.month + monthOffset, 1);
@@ -38,19 +38,24 @@ class ScheduleCalculator {
 
       result.add(item.copyWith(targetMonth: targetMonth));
 
-      itemsInCurrentMonth++;
-      if (itemsInCurrentMonth >= itemsPerMonth) {
+      minutesInCurrentMonth += item.runtime;
+
+      if (minutesInCurrentMonth >= currentBudget) {
         monthOffset++;
-        itemsInCurrentMonth = 0;
+        minutesInCurrentMonth = 0;
+        currentBudget = minutesPerMonth;
       }
     }
 
-    // Sort by original order
     result.sort((a, b) => a.order.compareTo(b.order));
     return result;
   }
 
-  /// Get schedule summary for display
+  static int _daysLeftInCurrentMonth(DateTime date) {
+    final lastDay = DateTime(date.year, date.month + 1, 0).day;
+    return lastDay - date.day + 1;
+  }
+
   static ScheduleSummary getScheduleSummary(List<WatchlistItem> items) {
     final now = DateTime.now();
     final doomsday = AppConstants.doomsdayDate;
@@ -60,7 +65,6 @@ class ScheduleCalculator {
     final totalUnwatchedMinutes =
         unwatchedItems.fold(0, (sum, i) => sum + i.runtime);
 
-    // Calculate recommended pace
     final itemsPerWeek = daysRemaining > 0
         ? unwatchedItems.length / (daysRemaining / 7.0)
         : 0.0;
