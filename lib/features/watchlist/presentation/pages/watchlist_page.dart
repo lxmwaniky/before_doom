@@ -341,18 +341,16 @@ class _WatchlistViewState extends State<WatchlistView> {
   }
 
   String _calculateScheduleStatus(List<WatchlistItem> items) {
-    // With dynamic scheduling, we're always on track since schedule adjusts
-    // to user's pace. Check if they're making any progress.
     final totalItems = items.length;
     final watchedItems = items.where((i) => i.isWatched).length;
 
-    if (watchedItems == 0) return 'on_track';
+    if (watchedItems == 0) return 'not_started';
     if (watchedItems == totalItems) return 'ahead';
 
     // Calculate expected progress based on time elapsed
     final now = DateTime.now();
     final doomsday = DateTime.utc(2026, 12, 18);
-    final startDate = DateTime.utc(2025, 12, 1); // Approximate start
+    final startDate = DateTime.utc(2025, 12, 1);
 
     final totalDays = doomsday.difference(startDate).inDays;
     final daysElapsed = now.difference(startDate).inDays;

@@ -136,6 +136,7 @@ class ProgressHeader extends StatelessWidget {
     return switch (scheduleStatus) {
       'behind' => theme.colorScheme.error,
       'ahead' => theme.colorScheme.tertiary,
+      'not_started' => theme.colorScheme.secondary,
       _ => theme.colorScheme.primary,
     };
   }
@@ -144,6 +145,7 @@ class ProgressHeader extends StatelessWidget {
     return switch (scheduleStatus) {
       'behind' => Icons.warning_amber_rounded,
       'ahead' => Icons.rocket_launch,
+      'not_started' => Icons.play_circle_outline,
       _ => Icons.check_circle_outline,
     };
   }
@@ -152,6 +154,7 @@ class ProgressHeader extends StatelessWidget {
     return switch (scheduleStatus) {
       'behind' => 'Behind Schedule',
       'ahead' => 'Ahead of Schedule',
+      'not_started' => 'Ready to Start',
       _ => 'On Track',
     };
   }

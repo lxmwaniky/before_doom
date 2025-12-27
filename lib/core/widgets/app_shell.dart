@@ -12,28 +12,50 @@ class AppShell extends StatefulWidget {
 
 class _AppShellState extends State<AppShell> {
   int _currentIndex = 0;
+  late final PageController _pageController;
 
-  final _pages = const <Widget>[
-    CountdownPage(),
-    WatchlistPage(),
-  ];
+  final _pages = const <Widget>[CountdownPage(), WatchlistPage()];
+
+  @override
+  void initState() {
+    super.initState();
+    _pageController = PageController();
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  void _onPageChanged(int index) {
+    setState(() {
+      _currentIndex = index;
+    });
+  }
+
+  void _onNavTapped(int index) {
+    _pageController.animateToPage(
+      index,
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
     return Scaffold(
-      body: IndexedStack(
-        index: _currentIndex,
+      body: PageView(
+        controller: _pageController,
+        onPageChanged: _onPageChanged,
+        physics: const BouncingScrollPhysics(),
         children: _pages,
       ),
       bottomNavigationBar: NavigationBar(
         selectedIndex: _currentIndex,
-        onDestinationSelected: (index) {
-          setState(() {
-            _currentIndex = index;
-          });
-        },
+        onDestinationSelected: _onNavTapped,
         backgroundColor: theme.colorScheme.surfaceContainer,
         indicatorColor: theme.colorScheme.primary.withValues(alpha: 0.2),
         destinations: [
@@ -44,10 +66,7 @@ class _AppShellState extends State<AppShell> {
                   ? theme.colorScheme.primary
                   : theme.colorScheme.onSurface,
             ),
-            selectedIcon: Icon(
-              Icons.timer,
-              color: theme.colorScheme.primary,
-            ),
+            selectedIcon: Icon(Icons.timer, color: theme.colorScheme.primary),
             label: 'Countdown',
           ),
           NavigationDestination(
@@ -57,10 +76,7 @@ class _AppShellState extends State<AppShell> {
                   ? theme.colorScheme.primary
                   : theme.colorScheme.onSurface,
             ),
-            selectedIcon: Icon(
-              Icons.movie,
-              color: theme.colorScheme.primary,
-            ),
+            selectedIcon: Icon(Icons.movie, color: theme.colorScheme.primary),
             label: 'Watchlist',
           ),
         ],
