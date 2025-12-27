@@ -152,12 +152,12 @@ class _CompletionShareDialogState extends State<CompletionShareDialog> {
                     Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFE23636).withValues(alpha: 0.2),
+                        color: const Color(0xFF2E7D32).withValues(alpha: 0.2),
                         shape: BoxShape.circle,
                       ),
                       child: const Icon(
                         Icons.check_circle,
-                        color: Color(0xFFE23636),
+                        color: Color(0xFF2E7D32),
                         size: 40,
                       ),
                     ),
@@ -196,7 +196,7 @@ class _CompletionShareDialogState extends State<CompletionShareDialog> {
                       children: [
                         const Icon(
                           Icons.timer,
-                          color: Color(0xFFE23636),
+                          color: Color(0xFF2E7D32),
                           size: 16,
                         ),
                         const SizedBox(width: 6),

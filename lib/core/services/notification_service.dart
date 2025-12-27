@@ -27,7 +27,7 @@ class NotificationService {
 
     try {
       tz.initializeTimeZones();
-      
+
       // Set local timezone properly
       final timezoneInfo = await FlutterTimezone.getLocalTimezone();
       final timezoneName = timezoneInfo.toString();
@@ -38,8 +38,9 @@ class NotificationService {
         tz.setLocalLocation(tz.UTC);
       }
 
-      const androidSettings =
-          AndroidInitializationSettings('@mipmap/ic_launcher');
+      const androidSettings = AndroidInitializationSettings(
+        '@mipmap/ic_launcher',
+      );
       const iosSettings = DarwinInitializationSettings(
         requestAlertPermission: true,
         requestBadgePermission: true,
@@ -75,12 +76,16 @@ class NotificationService {
       }
 
       if (Platform.isAndroid) {
-        final android = _notifications.resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>();
+        final android = _notifications
+            .resolvePlatformSpecificImplementation<
+              AndroidFlutterLocalNotificationsPlugin
+            >();
         return await android?.requestNotificationsPermission() ?? false;
       } else if (Platform.isIOS) {
-        final ios = _notifications.resolvePlatformSpecificImplementation<
-            IOSFlutterLocalNotificationsPlugin>();
+        final ios = _notifications
+            .resolvePlatformSpecificImplementation<
+              IOSFlutterLocalNotificationsPlugin
+            >();
         return await ios?.requestPermissions(
               alert: true,
               badge: true,
@@ -182,8 +187,7 @@ class NotificationService {
     }
   }
 
-  Future<void> _saveReminderSettings(
-      bool enabled, int hour, int minute) async {
+  Future<void> _saveReminderSettings(bool enabled, int hour, int minute) async {
     try {
       final box = await Hive.openBox(_reminderBoxKey);
       await box.put(_reminderEnabledKey, enabled);

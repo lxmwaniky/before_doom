@@ -6,13 +6,13 @@ import 'doom_colors.dart';
 class AppTheme {
   AppTheme._();
 
-  static const _marvelRed = Color(0xFFE23636);
+  static const _doomGreen = Color(0xFF2E7D32);
   static const _avengersGold = Color(0xFFFBB016);
   static const _deepCharcoal = Color(0xFF151515);
   static const _surfaceDark = Color(0xFF1E1E1E);
   static const _surfaceLight = Color(0xFFF5F5F5);
   static const _surfaceContainerLight = Color(0xFFFFFFFF);
-  static const _doomGreen = Color(0xFF2D5A27);
+  static const _doomGreenLight = Color(0xFF43A047);
   static const _vibraniumSilver = Color(0xFFBCC6CC);
   static const _infinityPurple = Color(0xFF6B3FA0);
 
@@ -29,15 +29,15 @@ class AppTheme {
         displayColor: Colors.white,
       ),
       colorScheme: const ColorScheme.dark(
-        primary: _marvelRed,
+        primary: _doomGreen,
         secondary: _avengersGold,
-        tertiary: _doomGreen,
+        tertiary: _doomGreenLight,
         surface: _deepCharcoal,
         surfaceContainer: _surfaceDark,
         onPrimary: Colors.white,
         onSecondary: Colors.black,
         onSurface: Colors.white,
-        error: _marvelRed,
+        error: Color(0xFFCF6679),
       ),
       appBarTheme: AppBarTheme(
         backgroundColor: _deepCharcoal,
@@ -57,7 +57,7 @@ class AppTheme {
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: _marvelRed,
+          backgroundColor: _doomGreen,
           foregroundColor: Colors.white,
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
           shape: RoundedRectangleBorder(
@@ -67,7 +67,7 @@ class AppTheme {
       ),
       extensions: const [
         DoomColors(
-          doomGreen: _doomGreen,
+          doomGreen: _doomGreenLight,
           vibraniumSilver: _vibraniumSilver,
           infinityPurple: _infinityPurple,
         ),
@@ -88,15 +88,15 @@ class AppTheme {
         displayColor: Colors.black87,
       ),
       colorScheme: const ColorScheme.light(
-        primary: _marvelRed,
+        primary: _doomGreen,
         secondary: _avengersGold,
-        tertiary: _doomGreen,
+        tertiary: _doomGreenLight,
         surface: _surfaceLight,
         surfaceContainer: _surfaceContainerLight,
         onPrimary: Colors.white,
         onSecondary: Colors.black,
         onSurface: Colors.black87,
-        error: _marvelRed,
+        error: Color(0xFFB00020),
       ),
       appBarTheme: AppBarTheme(
         backgroundColor: _surfaceLight,
@@ -118,7 +118,7 @@ class AppTheme {
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: _marvelRed,
+          backgroundColor: _doomGreen,
           foregroundColor: Colors.white,
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
           shape: RoundedRectangleBorder(
@@ -128,7 +128,7 @@ class AppTheme {
       ),
       extensions: const [
         DoomColors(
-          doomGreen: _doomGreen,
+          doomGreen: _doomGreenLight,
           vibraniumSilver: _vibraniumSilver,
           infinityPurple: _infinityPurple,
         ),

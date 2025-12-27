@@ -50,12 +50,12 @@ class ShareProgressCard extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFE23636).withValues(alpha: 0.2),
+                    color: const Color(0xFF2E7D32).withValues(alpha: 0.2),
                     shape: BoxShape.circle,
                   ),
                   child: Icon(
                     rank.icon,
-                    color: const Color(0xFFE23636),
+                    color: const Color(0xFF2E7D32),
                     size: 24,
                   ),
                 ),
@@ -66,7 +66,7 @@ class ShareProgressCard extends StatelessWidget {
                     Text(
                       rank.title.toUpperCase(),
                       style: const TextStyle(
-                        color: Color(0xFFE23636),
+                        color: Color(0xFF2E7D32),
                         fontWeight: FontWeight.bold,
                         fontSize: 14,
                         letterSpacing: 1.5,
@@ -120,7 +120,7 @@ class ShareProgressCard extends StatelessWidget {
                 value: progress.progressPercentage / 100,
                 minHeight: 10,
                 backgroundColor: Colors.white.withValues(alpha: 0.1),
-                valueColor: const AlwaysStoppedAnimation(Color(0xFFE23636)),
+                valueColor: const AlwaysStoppedAnimation(Color(0xFF2E7D32)),
               ),
             ),
             const SizedBox(height: 20),
@@ -146,7 +146,7 @@ class ShareProgressCard extends StatelessWidget {
                   Text(
                     'DOOMSDAY',
                     style: TextStyle(
-                      color: Color(0xFFE23636),
+                      color: Color(0xFF2E7D32),
                       fontWeight: FontWeight.bold,
                       fontSize: 12,
                       letterSpacing: 1,

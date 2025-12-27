@@ -20,6 +20,9 @@ class CountdownPage extends StatelessWidget {
 class CountdownView extends StatelessWidget {
   const CountdownView({super.key});
 
+  // Countdown screen accent color (dark green)
+  static const _accentColor = Color(0xFF2E7D32);
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -36,7 +39,7 @@ class CountdownView extends StatelessWidget {
             colors: [
               theme.colorScheme.surface,
               theme.colorScheme.surface,
-              theme.colorScheme.primary.withValues(alpha: 0.15),
+              _accentColor.withValues(alpha: 0.15),
             ],
           ),
         ),
@@ -57,7 +60,7 @@ class CountdownView extends StatelessWidget {
                       :final days,
                       :final hours,
                       :final minutes,
-                      :final seconds
+                      :final seconds,
                     ) =>
                       _buildCountdown(
                         theme,
@@ -88,17 +91,14 @@ class CountdownView extends StatelessWidget {
         shape: BoxShape.circle,
         boxShadow: [
           BoxShadow(
-            color: theme.colorScheme.primary.withValues(alpha: 0.4),
+            color: _accentColor.withValues(alpha: 0.4),
             blurRadius: 30,
             spreadRadius: 5,
           ),
         ],
       ),
       child: ClipOval(
-        child: Image.asset(
-          'assets/images/logo.jpg',
-          fit: BoxFit.cover,
-        ),
+        child: Image.asset('assets/images/logo.jpg', fit: BoxFit.cover),
       ),
     );
   }
@@ -117,7 +117,7 @@ class CountdownView extends StatelessWidget {
         Text(
           'DOOMSDAY',
           style: theme.textTheme.displayMedium?.copyWith(
-            color: theme.colorScheme.primary,
+            color: _accentColor,
             fontWeight: FontWeight.bold,
             letterSpacing: 4,
           ),
@@ -126,10 +126,7 @@ class CountdownView extends StatelessWidget {
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
           decoration: BoxDecoration(
-            border: Border.all(
-              color: theme.colorScheme.secondary,
-              width: 1,
-            ),
+            border: Border.all(color: theme.colorScheme.secondary, width: 1),
             borderRadius: BorderRadius.circular(20),
           ),
           child: Text(
@@ -157,9 +154,7 @@ class CountdownView extends StatelessWidget {
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            _buildCountdownUnit(theme, days, 'DAYS', isLarge: true),
-          ],
+          children: [_buildCountdownUnit(theme, days, 'DAYS', isLarge: true)],
         ),
         const SizedBox(height: 24),
         Row(
@@ -176,17 +171,19 @@ class CountdownView extends StatelessWidget {
     );
   }
 
-  Widget _buildCountdownUnit(ThemeData theme, int value, String label,
-      {bool isLarge = false}) {
+  Widget _buildCountdownUnit(
+    ThemeData theme,
+    int value,
+    String label, {
+    bool isLarge = false,
+  }) {
     return Column(
       children: [
         Text(
-          isLarge
-              ? value.toString()
-              : value.toString().padLeft(2, '0'),
+          isLarge ? value.toString() : value.toString().padLeft(2, '0'),
           style: isLarge
               ? theme.textTheme.displayLarge?.copyWith(
-                  color: theme.colorScheme.primary,
+                  color: _accentColor,
                   fontWeight: FontWeight.bold,
                   fontSize: 80,
                 )
@@ -212,7 +209,7 @@ class CountdownView extends StatelessWidget {
       child: Text(
         ':',
         style: theme.textTheme.headlineLarge?.copyWith(
-          color: theme.colorScheme.primary.withValues(alpha: 0.5),
+          color: _accentColor.withValues(alpha: 0.5),
           fontWeight: FontWeight.w300,
         ),
       ),
@@ -228,23 +225,19 @@ class CountdownView extends StatelessWidget {
             shape: BoxShape.circle,
             gradient: RadialGradient(
               colors: [
-                theme.colorScheme.primary.withValues(alpha: 0.3),
-                theme.colorScheme.primary.withValues(alpha: 0.1),
+                _accentColor.withValues(alpha: 0.3),
+                _accentColor.withValues(alpha: 0.1),
                 Colors.transparent,
               ],
             ),
           ),
-          child: Icon(
-            Icons.movie_filter,
-            size: 64,
-            color: theme.colorScheme.primary,
-          ),
+          child: Icon(Icons.movie_filter, size: 64, color: _accentColor),
         ),
         const SizedBox(height: 24),
         Text(
           'DOOMSDAY',
           style: theme.textTheme.displaySmall?.copyWith(
-            color: theme.colorScheme.primary,
+            color: _accentColor,
             fontWeight: FontWeight.bold,
             letterSpacing: 4,
           ),
