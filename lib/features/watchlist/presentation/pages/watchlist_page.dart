@@ -238,26 +238,29 @@ class _WatchlistViewState extends State<WatchlistView> {
   }
 
   String _calculateScheduleStatus(List<WatchlistItem> items) {
+    // With dynamic scheduling, we're always on track since schedule adjusts
+    // to user's pace. Check if they're making any progress.
+    final totalItems = items.length;
+    final watchedItems = items.where((i) => i.isWatched).length;
+
+    if (watchedItems == 0) return 'on_track';
+    if (watchedItems == totalItems) return 'ahead';
+
+    // Calculate expected progress based on time elapsed
     final now = DateTime.now();
-    final currentMonth = '${now.year}-${now.month.toString().padLeft(2, '0')}';
+    final doomsday = DateTime.utc(2026, 12, 18);
+    final startDate = DateTime.utc(2025, 12, 1); // Approximate start
 
-    int shouldBeWatched = 0;
-    int actuallyWatched = 0;
+    final totalDays = doomsday.difference(startDate).inDays;
+    final daysElapsed = now.difference(startDate).inDays;
 
-    for (final item in items) {
-      if (item.targetMonth.compareTo(currentMonth) <= 0) {
-        shouldBeWatched++;
-        if (item.isWatched) actuallyWatched++;
-      }
-    }
+    if (daysElapsed <= 0 || totalDays <= 0) return 'on_track';
 
-    if (shouldBeWatched == 0) return 'on_track';
+    final expectedProgress = (daysElapsed / totalDays * totalItems).floor();
+    final actualProgress = watchedItems;
 
-    final expectedProgress = shouldBeWatched;
-    final actualProgress = actuallyWatched;
-
-    if (actualProgress < expectedProgress * 0.8) return 'behind';
-    if (actualProgress > expectedProgress) return 'ahead';
+    if (actualProgress < expectedProgress * 0.7) return 'behind';
+    if (actualProgress > expectedProgress * 1.2) return 'ahead';
     return 'on_track';
   }
 

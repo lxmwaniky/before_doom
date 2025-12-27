@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 
+import '../../../../core/util/schedule_calculator.dart';
 import '../../domain/entities/movie.dart';
 import '../../domain/repositories/movie_repository.dart';
 
@@ -34,14 +35,24 @@ class WatchlistLoaded extends WatchlistState {
     return items.where((m) => m.watchPath == activeFilter).toList();
   }
 
+  /// Items with dynamically calculated target months based on current progress
+  List<WatchlistItem> get scheduledItems {
+    return ScheduleCalculator.assignDynamicSchedule(filteredItems);
+  }
+
   Map<String, List<WatchlistItem>> get itemsByMonth {
+    final scheduled = scheduledItems;
     final result = <String, List<WatchlistItem>>{};
-    for (final item in filteredItems) {
+    for (final item in scheduled) {
       result.putIfAbsent(item.targetMonth, () => []).add(item);
     }
     return Map.fromEntries(
       result.entries.toList()..sort((a, b) => a.key.compareTo(b.key)),
     );
+  }
+
+  ScheduleSummary get scheduleSummary {
+    return ScheduleCalculator.getScheduleSummary(items);
   }
 
   WatchlistLoaded copyWith({
