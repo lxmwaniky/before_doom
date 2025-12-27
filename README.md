@@ -1,5 +1,7 @@
 # Before Doom
 
+![Before Doom Banner](assets/images/banner.jpeg)
+
 MCU rewatch tracker with countdown to **Avengers: Doomsday** (December 18, 2026).
 
 ## Features

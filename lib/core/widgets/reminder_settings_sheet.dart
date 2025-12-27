@@ -108,27 +108,6 @@ class _ReminderSettingsSheetState extends State<ReminderSettingsSheet> {
     }
   }
 
-  Future<void> _sendTestNotification() async {
-    try {
-      final success = await _notificationService.showTestNotification();
-      if (!mounted) return;
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            success ? 'Test notification sent!' : 'Notifications unavailable',
-          ),
-        ),
-      );
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Failed to send test notification')),
-        );
-      }
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -211,14 +190,7 @@ class _ReminderSettingsSheetState extends State<ReminderSettingsSheet> {
               ),
             ),
           ),
-          const SizedBox(height: 16),
-          if (_isEnabled)
-            TextButton.icon(
-              onPressed: _sendTestNotification,
-              icon: const Icon(Icons.send),
-              label: const Text('Send Test Notification'),
-            ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 24),
         ],
       ),
     );
