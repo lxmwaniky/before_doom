@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../core/widgets/completion_share_dialog.dart';
 import '../../domain/entities/movie.dart';
@@ -100,7 +101,11 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
                     _buildEpisodeTracker(theme, item),
                     const SizedBox(height: 24),
                   ],
-                  if (!item.comingSoon) _buildWatchButton(theme),
+                  if (!item.comingSoon) ...[
+                    _buildWatchNowButton(theme, item),
+                    const SizedBox(height: 12),
+                    _buildWatchButton(theme),
+                  ],
                   if (item.comingSoon) _buildComingSoonMessage(theme),
                   const SizedBox(height: 24),
                   _buildRelatedItems(theme, item),
@@ -221,6 +226,31 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
           ],
         ),
       ],
+    );
+  }
+
+  Widget _buildWatchNowButton(ThemeData theme, WatchlistItem item) {
+    final mediaType = item.isMovie ? 'movie' : 'tv';
+    final watchUrl =
+        'https://www.themoviedb.org/$mediaType/${item.tmdbId}/watch';
+
+    return SizedBox(
+      width: double.infinity,
+      child: OutlinedButton.icon(
+        onPressed: () async {
+          final uri = Uri.parse(watchUrl);
+          if (await canLaunchUrl(uri)) {
+            await launchUrl(uri, mode: LaunchMode.externalApplication);
+          }
+        },
+        icon: const Icon(Icons.play_circle_outline),
+        label: const Text('Watch Now'),
+        style: OutlinedButton.styleFrom(
+          padding: const EdgeInsets.symmetric(vertical: 16),
+          side: BorderSide(color: theme.colorScheme.secondary),
+          foregroundColor: theme.colorScheme.secondary,
+        ),
+      ),
     );
   }
 

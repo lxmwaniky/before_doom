@@ -86,7 +86,7 @@ class _CompletionShareDialogState extends State<CompletionShareDialog> {
 
       await Share.shareXFiles([
         XFile(file.path),
-      ], text: 'Just finished $_displayTitle! #BeforeDoom #Doomsday');
+      ], text: 'Just finished $_displayTitle! #BeforeDoom #Doomsday\n\nTrack your MCU journey: https://play.google.com/store/apps/details?id=com.lxmwaniky.doom');
     } catch (e) {
       debugPrint('Share failed: $e');
     } finally {

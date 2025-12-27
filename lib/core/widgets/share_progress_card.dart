@@ -199,7 +199,7 @@ class ShareService {
 
       await Share.shareXFiles([
         XFile(file.path),
-      ], text: 'My MCU Rewatch Progress - Road to Avengers: Doomsday! 🎬');
+      ], text: 'My MCU Rewatch Progress - Road to Avengers: Doomsday!\n\nTrack your journey: https://play.google.com/store/apps/details?id=com.lxmwaniky.doom');
     } catch (e) {
       debugPrint('Share failed: $e');
     }
