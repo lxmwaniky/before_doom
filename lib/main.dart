@@ -11,7 +11,13 @@ import 'features/watchlist/domain/entities/movie.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  await dotenv.load(fileName: '.env');
+  // Load environment variables
+  // If .env file is missing, app will still work with limited features
+  try {
+    await dotenv.load(fileName: '.env');
+  } catch (e) {
+    debugPrint('Warning: .env file not found. Some features may be limited.');
+  }
 
   await Hive.initFlutter();
   Hive.registerAdapter(WatchlistItemAdapter());

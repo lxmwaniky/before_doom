@@ -68,17 +68,27 @@ class TmdbDataSourceImpl implements TmdbDataSource {
   @override
   Future<List<WatchlistItem>> getWatchlist() async {
     if (_apiKey.isEmpty) {
-      throw const ServerException('TMDB API key not configured');
+      throw const ServerException(
+        'TMDB API key not configured. Please add TMDB_API_KEY to your .env file.',
+      );
     }
 
     final data = await _loadWatchlistJson();
-    final jsonItems = data['items'] as List;
+    final jsonItems = data['items'] as List?;
+    
+    if (jsonItems == null || jsonItems.isEmpty) {
+      throw const ServerException(
+        'Invalid watchlist data. The JSON file may be corrupted.',
+      );
+    }
 
     final futures = <Future<WatchlistItem?>>[];
 
     for (final itemData in jsonItems) {
-      final tmdbId = itemData['tmdbId'] as int;
-      final type = itemData['type'] as String;
+      if (itemData is! Map<String, dynamic>) continue;
+      
+      final tmdbId = itemData['tmdbId'] as int? ?? 0;
+      final type = itemData['type'] as String? ?? 'movie';
       final comingSoon = itemData['comingSoon'] == true;
 
       if (comingSoon || tmdbId == 0) {
@@ -98,7 +108,7 @@ class TmdbDataSourceImpl implements TmdbDataSource {
 
     if (items.isEmpty) {
       throw const ServerException(
-        'Failed to fetch watchlist. Check your connection.',
+        'Failed to fetch watchlist. Check your internet connection and TMDB API key.',
       );
     }
 
