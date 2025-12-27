@@ -2,15 +2,15 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 
 import '../../../../core/error/exceptions.dart';
-import '../../domain/entities/mcu_movie_data.dart';
 import '../../domain/entities/movie.dart';
 
 abstract class TmdbDataSource {
-  Future<List<Movie>> getMcuMovies();
+  Future<List<WatchlistItem>> getWatchlist();
 }
 
 class TmdbDataSourceImpl implements TmdbDataSource {
@@ -23,23 +23,37 @@ class TmdbDataSourceImpl implements TmdbDataSource {
   String get _apiKey => dotenv.env['TMDB_API_KEY'] ?? '';
 
   @override
-  Future<List<Movie>> getMcuMovies() async {
+  Future<List<WatchlistItem>> getWatchlist() async {
     if (_apiKey.isEmpty) {
       throw const ServerException('TMDB API key not configured');
     }
 
-    final movies = <Movie>[];
+    final jsonStr = await rootBundle.loadString('assets/marvel_watchlist.json');
+    final data = jsonDecode(jsonStr) as Map<String, dynamic>;
+    final jsonItems = data['items'] as List;
 
-    for (final movieData in McuMovieData.mcuMovies) {
+    final items = <WatchlistItem>[];
+
+    for (final itemData in jsonItems) {
+      final tmdbId = itemData['tmdbId'] as int;
+      final type = itemData['type'] as String;
+      final comingSoon = itemData['comingSoon'] == true;
+
+      if (comingSoon || tmdbId == 0) {
+        items.add(_createComingSoonItem(itemData));
+        continue;
+      }
+
       try {
-        final movie = await _fetchMovieDetails(movieData['id'] as int);
-        if (movie != null) {
-          final enrichedMovie = movie.copyWith(
-            phase: movieData['phase'] as int,
-            order: movieData['order'] as int,
-            watchPaths: List<String>.from(movieData['paths'] as List),
-          );
-          movies.add(enrichedMovie);
+        WatchlistItem? item;
+        if (type == 'movie') {
+          item = await _fetchMovieDetails(itemData);
+        } else {
+          item = await _fetchTvDetails(itemData);
+        }
+
+        if (item != null) {
+          items.add(item);
         }
       } on SocketException {
         throw const ServerException('No internet connection');
@@ -50,37 +64,127 @@ class TmdbDataSourceImpl implements TmdbDataSource {
       }
     }
 
-    if (movies.isEmpty) {
-      throw const ServerException('Failed to fetch movies. Check your connection.');
+    if (items.isEmpty) {
+      throw const ServerException('Failed to fetch watchlist. Check your connection.');
     }
 
-    movies.sort((a, b) => a.order.compareTo(b.order));
-    return movies;
+    items.sort((a, b) => a.order.compareTo(b.order));
+    return items;
   }
 
-  Future<Movie?> _fetchMovieDetails(int movieId) async {
+  WatchlistItem _createComingSoonItem(Map<String, dynamic> itemData) {
+    return WatchlistItem(
+      tmdbId: itemData['tmdbId'] as int? ?? 0,
+      title: itemData['title'] as String,
+      runtime: 0,
+      posterPath: null,
+      overview: 'Coming soon to the MCU.',
+      releaseDate: '',
+      targetMonth: itemData['targetMonth'] as String,
+      watchPath: itemData['path'] as String,
+      order: itemData['order'] as int,
+      contentType: itemData['type'] == 'movie' ? 0 : 1,
+      season: itemData['season'] as int?,
+      comingSoon: true,
+    );
+  }
+
+  Future<WatchlistItem?> _fetchMovieDetails(Map<String, dynamic> itemData) async {
+    final tmdbId = itemData['tmdbId'] as int;
+
     try {
       final response = await client
-          .get(Uri.parse('$_baseUrl/movie/$movieId?api_key=$_apiKey'))
+          .get(Uri.parse('$_baseUrl/movie/$tmdbId?api_key=$_apiKey'))
           .timeout(_timeout);
 
       if (response.statusCode == 200) {
         final json = jsonDecode(response.body) as Map<String, dynamic>;
-        return Movie(
-          id: json['id'] as int,
+        return WatchlistItem(
+          tmdbId: json['id'] as int,
           title: json['title'] as String,
           runtime: json['runtime'] as int? ?? 0,
           posterPath: json['poster_path'] as String?,
           overview: json['overview'] as String?,
           releaseDate: json['release_date'] as String? ?? '',
-          phase: 1,
-          watchPaths: [],
-          order: 0,
+          targetMonth: itemData['targetMonth'] as String,
+          watchPath: itemData['path'] as String,
+          order: itemData['order'] as int,
+          contentType: 0,
         );
       }
       return null;
     } on TimeoutException {
       return null;
     }
+  }
+
+  Future<WatchlistItem?> _fetchTvDetails(Map<String, dynamic> itemData) async {
+    final tmdbId = itemData['tmdbId'] as int;
+    final season = itemData['season'] as int?;
+
+    try {
+      final response = await client
+          .get(Uri.parse('$_baseUrl/tv/$tmdbId?api_key=$_apiKey'))
+          .timeout(_timeout);
+
+      if (response.statusCode != 200) return null;
+
+      final json = jsonDecode(response.body) as Map<String, dynamic>;
+
+      int episodeCount = 0;
+      int runtime = 0;
+
+      if (season != null) {
+        final seasonData = await _fetchSeasonDetails(tmdbId, season);
+        episodeCount = seasonData['episodeCount'] as int? ?? 0;
+        runtime = (seasonData['runtime'] as int? ?? 45) * episodeCount;
+      } else {
+        final seasons = json['seasons'] as List? ?? [];
+        for (final s in seasons) {
+          if ((s['season_number'] as int? ?? 0) > 0) {
+            episodeCount += s['episode_count'] as int? ?? 0;
+          }
+        }
+        runtime = (json['episode_run_time'] as List?)?.firstOrNull as int? ?? 45;
+        runtime *= episodeCount;
+      }
+
+      return WatchlistItem(
+        tmdbId: json['id'] as int,
+        title: json['name'] as String,
+        runtime: runtime,
+        posterPath: json['poster_path'] as String?,
+        overview: json['overview'] as String?,
+        releaseDate: json['first_air_date'] as String? ?? '',
+        targetMonth: itemData['targetMonth'] as String,
+        watchPath: itemData['path'] as String,
+        order: itemData['order'] as int,
+        contentType: 1,
+        season: season,
+        episodeCount: episodeCount,
+      );
+    } on TimeoutException {
+      return null;
+    }
+  }
+
+  Future<Map<String, dynamic>> _fetchSeasonDetails(int tvId, int seasonNum) async {
+    try {
+      final response = await client
+          .get(Uri.parse('$_baseUrl/tv/$tvId/season/$seasonNum?api_key=$_apiKey'))
+          .timeout(_timeout);
+
+      if (response.statusCode == 200) {
+        final json = jsonDecode(response.body) as Map<String, dynamic>;
+        final episodes = json['episodes'] as List? ?? [];
+        return {
+          'episodeCount': episodes.length,
+          'runtime': episodes.isNotEmpty
+              ? (episodes.first['runtime'] as int? ?? 45)
+              : 45,
+        };
+      }
+    } catch (_) {}
+    return {'episodeCount': 0, 'runtime': 45};
   }
 }

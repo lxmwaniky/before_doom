@@ -7,17 +7,21 @@ import '../../features/watchlist/data/datasources/tmdb_data_source.dart';
 import '../../features/watchlist/data/repositories/movie_repository_impl.dart';
 import '../../features/watchlist/domain/repositories/movie_repository.dart';
 import '../../features/watchlist/presentation/bloc/watchlist_bloc.dart';
+import '../services/streak_service.dart';
 
 final sl = GetIt.instance;
 
 Future<void> initDependencies() async {
   // BLoCs
   sl.registerFactory(() => CountdownBloc());
-  sl.registerFactory(() => WatchlistBloc(repository: sl()));
+  sl.registerFactory(() => WatchlistBloc(
+        repository: sl(),
+        streakService: sl(),
+      ));
 
   // Repositories
-  sl.registerLazySingleton<MovieRepository>(
-    () => MovieRepositoryImpl(
+  sl.registerLazySingleton<WatchlistRepository>(
+    () => WatchlistRepositoryImpl(
       remoteDataSource: sl(),
       localDataSource: sl(),
     ),
@@ -27,8 +31,13 @@ Future<void> initDependencies() async {
   sl.registerLazySingleton<TmdbDataSource>(
     () => TmdbDataSourceImpl(client: sl()),
   );
-  sl.registerLazySingleton<MovieLocalDataSource>(
-    () => MovieLocalDataSourceImpl(),
+  sl.registerLazySingleton<WatchlistLocalDataSource>(
+    () => WatchlistLocalDataSourceImpl(),
+  );
+
+  // Services
+  sl.registerLazySingleton<StreakService>(
+    () => StreakServiceImpl(),
   );
 
   // External

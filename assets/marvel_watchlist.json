@@ -1,0 +1,859 @@
+{
+    "version": 1,
+    "lastUpdated": "2025-12-27",
+    "items": [
+        {
+            "tmdbId": 1040148,
+            "type": "tv",
+            "title": "Eyes of Wakanda",
+            "targetMonth": "2025-12",
+            "path": "completionist",
+            "order": 1
+        },
+        {
+            "tmdbId": 1771,
+            "type": "movie",
+            "title": "Captain America: The First Avenger",
+            "targetMonth": "2025-12",
+            "path": "essential",
+            "order": 2
+        },
+        {
+            "tmdbId": 61550,
+            "type": "tv",
+            "title": "Agent Carter",
+            "targetMonth": "2025-12",
+            "path": "completionist",
+            "season": 1,
+            "order": 3
+        },
+        {
+            "tmdbId": 61550,
+            "type": "tv",
+            "title": "Agent Carter",
+            "targetMonth": "2026-01",
+            "path": "completionist",
+            "season": 2,
+            "order": 4
+        },
+        {
+            "tmdbId": 49538,
+            "type": "movie",
+            "title": "X-Men: First Class",
+            "targetMonth": "2026-01",
+            "path": "movies",
+            "order": 5
+        },
+        {
+            "tmdbId": 2080,
+            "type": "movie",
+            "title": "X-Men Origins: Wolverine",
+            "targetMonth": "2026-01",
+            "path": "movies",
+            "order": 6
+        },
+        {
+            "tmdbId": 11929,
+            "type": "movie",
+            "title": "Howard the Duck",
+            "targetMonth": "2026-01",
+            "path": "completionist",
+            "order": 7
+        },
+        {
+            "tmdbId": 299537,
+            "type": "movie",
+            "title": "Captain Marvel",
+            "targetMonth": "2026-01",
+            "path": "essential",
+            "order": 8
+        },
+        {
+            "tmdbId": 36647,
+            "type": "movie",
+            "title": "Blade",
+            "targetMonth": "2026-01",
+            "path": "movies",
+            "order": 9
+        },
+        {
+            "tmdbId": 36657,
+            "type": "movie",
+            "title": "X-Men",
+            "targetMonth": "2026-01",
+            "path": "movies",
+            "order": 10
+        },
+        {
+            "tmdbId": 557,
+            "type": "movie",
+            "title": "Spider-Man",
+            "targetMonth": "2026-01",
+            "path": "movies",
+            "order": 11
+        },
+        {
+            "tmdbId": 36658,
+            "type": "movie",
+            "title": "X2: X-Men United",
+            "targetMonth": "2026-01",
+            "path": "movies",
+            "order": 12
+        },
+        {
+            "tmdbId": 8867,
+            "type": "movie",
+            "title": "Elektra",
+            "targetMonth": "2026-01",
+            "path": "completionist",
+            "order": 13
+        },
+        {
+            "tmdbId": 9480,
+            "type": "movie",
+            "title": "Daredevil",
+            "targetMonth": "2026-01",
+            "path": "completionist",
+            "order": 14
+        },
+        {
+            "tmdbId": 6560,
+            "type": "movie",
+            "title": "The Punisher",
+            "targetMonth": "2026-01",
+            "path": "completionist",
+            "order": 15
+        },
+        {
+            "tmdbId": 558,
+            "type": "movie",
+            "title": "Spider-Man 2",
+            "targetMonth": "2026-01",
+            "path": "movies",
+            "order": 16
+        },
+        {
+            "tmdbId": 9738,
+            "type": "movie",
+            "title": "Fantastic Four",
+            "targetMonth": "2026-01",
+            "path": "movies",
+            "order": 17
+        },
+        {
+            "tmdbId": 1979,
+            "type": "movie",
+            "title": "Fantastic Four: Rise of the Silver Surfer",
+            "targetMonth": "2026-01",
+            "path": "movies",
+            "order": 18
+        },
+        {
+            "tmdbId": 36668,
+            "type": "movie",
+            "title": "X-Men: The Last Stand",
+            "targetMonth": "2026-01",
+            "path": "movies",
+            "order": 19
+        },
+        {
+            "tmdbId": 1250,
+            "type": "movie",
+            "title": "Ghost Rider",
+            "targetMonth": "2026-01",
+            "path": "completionist",
+            "order": 20
+        },
+        {
+            "tmdbId": 57847,
+            "type": "movie",
+            "title": "Ghost Rider: Spirit of Vengeance",
+            "targetMonth": "2026-01",
+            "path": "completionist",
+            "order": 21
+        },
+        {
+            "tmdbId": 559,
+            "type": "movie",
+            "title": "Spider-Man 3",
+            "targetMonth": "2026-01",
+            "path": "movies",
+            "order": 22
+        },
+        {
+            "tmdbId": 1724,
+            "type": "movie",
+            "title": "The Incredible Hulk",
+            "targetMonth": "2026-01",
+            "path": "essential",
+            "order": 23
+        },
+        {
+            "tmdbId": 1726,
+            "type": "movie",
+            "title": "Iron Man",
+            "targetMonth": "2026-01",
+            "path": "essential",
+            "order": 24
+        },
+        {
+            "tmdbId": 10138,
+            "type": "movie",
+            "title": "Iron Man 2",
+            "targetMonth": "2026-01",
+            "path": "essential",
+            "order": 25
+        },
+        {
+            "tmdbId": 1927,
+            "type": "movie",
+            "title": "Hulk",
+            "targetMonth": "2026-01",
+            "path": "completionist",
+            "order": 26
+        },
+        {
+            "tmdbId": 10195,
+            "type": "movie",
+            "title": "Thor",
+            "targetMonth": "2026-01",
+            "path": "essential",
+            "order": 27
+        },
+        {
+            "tmdbId": 24428,
+            "type": "movie",
+            "title": "The Avengers",
+            "targetMonth": "2026-02",
+            "path": "essential",
+            "order": 28
+        },
+        {
+            "tmdbId": 1403,
+            "type": "tv",
+            "title": "Agents of S.H.I.E.L.D.",
+            "targetMonth": "2026-02",
+            "path": "completionist",
+            "order": 29
+        },
+        {
+            "tmdbId": 76338,
+            "type": "movie",
+            "title": "Thor: The Dark World",
+            "targetMonth": "2026-03",
+            "path": "movies",
+            "order": 30
+        },
+        {
+            "tmdbId": 76170,
+            "type": "movie",
+            "title": "The Wolverine",
+            "targetMonth": "2026-03",
+            "path": "movies",
+            "order": 31
+        },
+        {
+            "tmdbId": 127585,
+            "type": "movie",
+            "title": "X-Men: Days of Future Past",
+            "targetMonth": "2026-03",
+            "path": "movies",
+            "order": 32
+        },
+        {
+            "tmdbId": 246655,
+            "type": "movie",
+            "title": "X-Men: Apocalypse",
+            "targetMonth": "2026-03",
+            "path": "movies",
+            "order": 33
+        },
+        {
+            "tmdbId": 320288,
+            "type": "movie",
+            "title": "X-Men: Dark Phoenix",
+            "targetMonth": "2026-03",
+            "path": "movies",
+            "order": 34
+        },
+        {
+            "tmdbId": 1930,
+            "type": "movie",
+            "title": "The Amazing Spider-Man",
+            "targetMonth": "2026-03",
+            "path": "movies",
+            "order": 35
+        },
+        {
+            "tmdbId": 68721,
+            "type": "movie",
+            "title": "Iron Man 3",
+            "targetMonth": "2026-03",
+            "path": "essential",
+            "order": 36
+        },
+        {
+            "tmdbId": 100402,
+            "type": "movie",
+            "title": "Captain America: The Winter Soldier",
+            "targetMonth": "2026-03",
+            "path": "essential",
+            "order": 37
+        },
+        {
+            "tmdbId": 102382,
+            "type": "movie",
+            "title": "The Amazing Spider-Man 2",
+            "targetMonth": "2026-03",
+            "path": "movies",
+            "order": 38
+        },
+        {
+            "tmdbId": 118340,
+            "type": "movie",
+            "title": "Guardians of the Galaxy",
+            "targetMonth": "2026-03",
+            "path": "essential",
+            "order": 39
+        },
+        {
+            "tmdbId": 283995,
+            "type": "movie",
+            "title": "Guardians of the Galaxy Vol. 2",
+            "targetMonth": "2026-03",
+            "path": "movies",
+            "order": 40
+        },
+        {
+            "tmdbId": 61889,
+            "type": "tv",
+            "title": "Daredevil",
+            "targetMonth": "2026-03",
+            "path": "essential",
+            "season": 1,
+            "order": 41
+        },
+        {
+            "tmdbId": 38472,
+            "type": "tv",
+            "title": "Jessica Jones",
+            "targetMonth": "2026-03",
+            "path": "completionist",
+            "season": 1,
+            "order": 42
+        },
+        {
+            "tmdbId": 99861,
+            "type": "movie",
+            "title": "Avengers: Age of Ultron",
+            "targetMonth": "2026-04",
+            "path": "essential",
+            "order": 43
+        },
+        {
+            "tmdbId": 102899,
+            "type": "movie",
+            "title": "Ant-Man",
+            "targetMonth": "2026-04",
+            "path": "movies",
+            "order": 44
+        },
+        {
+            "tmdbId": 62126,
+            "type": "tv",
+            "title": "Luke Cage",
+            "targetMonth": "2026-04",
+            "path": "completionist",
+            "season": 1,
+            "order": 45
+        },
+        {
+            "tmdbId": 62126,
+            "type": "tv",
+            "title": "Luke Cage",
+            "targetMonth": "2026-05",
+            "path": "completionist",
+            "season": 2,
+            "order": 46
+        },
+        {
+            "tmdbId": 61889,
+            "type": "tv",
+            "title": "Daredevil",
+            "targetMonth": "2026-05",
+            "path": "essential",
+            "season": 2,
+            "order": 47
+        },
+        {
+            "tmdbId": 62127,
+            "type": "tv",
+            "title": "Iron Fist",
+            "targetMonth": "2026-05",
+            "path": "completionist",
+            "order": 48
+        },
+        {
+            "tmdbId": 62285,
+            "type": "tv",
+            "title": "The Defenders",
+            "targetMonth": "2026-05",
+            "path": "completionist",
+            "order": 49
+        },
+        {
+            "tmdbId": 271110,
+            "type": "movie",
+            "title": "Captain America: Civil War",
+            "targetMonth": "2026-05",
+            "path": "essential",
+            "order": 50
+        },
+        {
+            "tmdbId": 497698,
+            "type": "movie",
+            "title": "Black Widow",
+            "targetMonth": "2026-05",
+            "path": "movies",
+            "order": 51
+        },
+        {
+            "tmdbId": 284054,
+            "type": "movie",
+            "title": "Black Panther",
+            "targetMonth": "2026-05",
+            "path": "essential",
+            "order": 52
+        },
+        {
+            "tmdbId": 67178,
+            "type": "tv",
+            "title": "The Punisher",
+            "targetMonth": "2026-05",
+            "path": "completionist",
+            "order": 53
+        },
+        {
+            "tmdbId": 315635,
+            "type": "movie",
+            "title": "Spider-Man: Homecoming",
+            "targetMonth": "2026-05",
+            "path": "essential",
+            "order": 54
+        },
+        {
+            "tmdbId": 284052,
+            "type": "movie",
+            "title": "Doctor Strange",
+            "targetMonth": "2026-06",
+            "path": "essential",
+            "order": 55
+        },
+        {
+            "tmdbId": 284053,
+            "type": "movie",
+            "title": "Thor: Ragnarok",
+            "targetMonth": "2026-06",
+            "path": "essential",
+            "order": 56
+        },
+        {
+            "tmdbId": 335983,
+            "type": "movie",
+            "title": "Venom",
+            "targetMonth": "2026-06",
+            "path": "movies",
+            "order": 57
+        },
+        {
+            "tmdbId": 324857,
+            "type": "movie",
+            "title": "Spider-Man: Into the Spider-Verse",
+            "targetMonth": "2026-06",
+            "path": "essential",
+            "order": 58
+        },
+        {
+            "tmdbId": 293660,
+            "type": "movie",
+            "title": "Deadpool",
+            "targetMonth": "2026-06",
+            "path": "essential",
+            "order": 59
+        },
+        {
+            "tmdbId": 363088,
+            "type": "movie",
+            "title": "Ant-Man and the Wasp",
+            "targetMonth": "2026-06",
+            "path": "movies",
+            "order": 60
+        },
+        {
+            "tmdbId": 299536,
+            "type": "movie",
+            "title": "Avengers: Infinity War",
+            "targetMonth": "2026-06",
+            "path": "essential",
+            "order": 61
+        },
+        {
+            "tmdbId": 299534,
+            "type": "movie",
+            "title": "Avengers: Endgame",
+            "targetMonth": "2026-06",
+            "path": "essential",
+            "order": 62
+        },
+        {
+            "tmdbId": 340102,
+            "type": "movie",
+            "title": "The New Mutants",
+            "targetMonth": "2026-06",
+            "path": "completionist",
+            "order": 63
+        },
+        {
+            "tmdbId": 84958,
+            "type": "tv",
+            "title": "Loki",
+            "targetMonth": "2026-06",
+            "path": "essential",
+            "season": 1,
+            "order": 64
+        },
+        {
+            "tmdbId": 91363,
+            "type": "tv",
+            "title": "What If...?",
+            "targetMonth": "2026-06",
+            "path": "completionist",
+            "order": 65
+        },
+        {
+            "tmdbId": 85271,
+            "type": "tv",
+            "title": "WandaVision",
+            "targetMonth": "2026-07",
+            "path": "essential",
+            "order": 66
+        },
+        {
+            "tmdbId": 88396,
+            "type": "tv",
+            "title": "The Falcon and the Winter Soldier",
+            "targetMonth": "2026-07",
+            "path": "essential",
+            "order": 67
+        },
+        {
+            "tmdbId": 429617,
+            "type": "movie",
+            "title": "Spider-Man: Far From Home",
+            "targetMonth": "2026-07",
+            "path": "essential",
+            "order": 68
+        },
+        {
+            "tmdbId": 580489,
+            "type": "movie",
+            "title": "Venom: Let There Be Carnage",
+            "targetMonth": "2026-07",
+            "path": "movies",
+            "order": 69
+        },
+        {
+            "tmdbId": 634649,
+            "type": "movie",
+            "title": "Spider-Man: No Way Home",
+            "targetMonth": "2026-07",
+            "path": "essential",
+            "order": 70
+        },
+        {
+            "tmdbId": 569094,
+            "type": "movie",
+            "title": "Spider-Man: Across the Spider-Verse",
+            "targetMonth": "2026-07",
+            "path": "essential",
+            "order": 71
+        },
+        {
+            "tmdbId": 526896,
+            "type": "movie",
+            "title": "Morbius",
+            "targetMonth": "2026-07",
+            "path": "completionist",
+            "order": 72
+        },
+        {
+            "tmdbId": 912649,
+            "type": "movie",
+            "title": "Venom: The Last Dance",
+            "targetMonth": "2026-07",
+            "path": "movies",
+            "order": 73
+        },
+        {
+            "tmdbId": 590706,
+            "type": "movie",
+            "title": "Madame Web",
+            "targetMonth": "2026-07",
+            "path": "completionist",
+            "order": 74
+        },
+        {
+            "tmdbId": 539972,
+            "type": "movie",
+            "title": "Kraven the Hunter",
+            "targetMonth": "2026-07",
+            "path": "completionist",
+            "order": 75
+        },
+        {
+            "tmdbId": 566525,
+            "type": "movie",
+            "title": "Shang-Chi and the Legend of the Ten Rings",
+            "targetMonth": "2026-08",
+            "path": "movies",
+            "order": 76
+        },
+        {
+            "tmdbId": 524434,
+            "type": "movie",
+            "title": "Eternals",
+            "targetMonth": "2026-08",
+            "path": "movies",
+            "order": 77
+        },
+        {
+            "tmdbId": 453395,
+            "type": "movie",
+            "title": "Doctor Strange in the Multiverse of Madness",
+            "targetMonth": "2026-08",
+            "path": "essential",
+            "order": 78
+        },
+        {
+            "tmdbId": 88329,
+            "type": "tv",
+            "title": "Hawkeye",
+            "targetMonth": "2026-08",
+            "path": "movies",
+            "order": 79
+        },
+        {
+            "tmdbId": 92749,
+            "type": "tv",
+            "title": "Moon Knight",
+            "targetMonth": "2026-08",
+            "path": "movies",
+            "order": 80
+        },
+        {
+            "tmdbId": 203504,
+            "type": "tv",
+            "title": "Echo",
+            "targetMonth": "2026-08",
+            "path": "completionist",
+            "order": 81
+        },
+        {
+            "tmdbId": 92783,
+            "type": "tv",
+            "title": "She-Hulk: Attorney at Law",
+            "targetMonth": "2026-08",
+            "path": "completionist",
+            "order": 82
+        },
+        {
+            "tmdbId": 92782,
+            "type": "tv",
+            "title": "Ms. Marvel",
+            "targetMonth": "2026-09",
+            "path": "essential",
+            "order": 83
+        },
+        {
+            "tmdbId": 616037,
+            "type": "movie",
+            "title": "Thor: Love and Thunder",
+            "targetMonth": "2026-09",
+            "path": "movies",
+            "order": 84
+        },
+        {
+            "tmdbId": 505642,
+            "type": "movie",
+            "title": "Black Panther: Wakanda Forever",
+            "targetMonth": "2026-09",
+            "path": "movies",
+            "order": 85
+        },
+        {
+            "tmdbId": 198178,
+            "type": "tv",
+            "title": "Ironheart",
+            "targetMonth": "2026-09",
+            "path": "completionist",
+            "order": 86
+        },
+        {
+            "tmdbId": 894205,
+            "type": "movie",
+            "title": "Werewolf by Night",
+            "targetMonth": "2026-09",
+            "path": "completionist",
+            "order": 87
+        },
+        {
+            "tmdbId": 774752,
+            "type": "movie",
+            "title": "The Guardians of the Galaxy Holiday Special",
+            "targetMonth": "2026-09",
+            "path": "completionist",
+            "order": 88
+        },
+        {
+            "tmdbId": 640146,
+            "type": "movie",
+            "title": "Ant-Man and the Wasp: Quantumania",
+            "targetMonth": "2026-09",
+            "path": "movies",
+            "order": 89
+        },
+        {
+            "tmdbId": 447365,
+            "type": "movie",
+            "title": "Guardians of the Galaxy Vol. 3",
+            "targetMonth": "2026-09",
+            "path": "movies",
+            "order": 90
+        },
+        {
+            "tmdbId": 114472,
+            "type": "tv",
+            "title": "Secret Invasion",
+            "targetMonth": "2026-10",
+            "path": "completionist",
+            "order": 91
+        },
+        {
+            "tmdbId": 609681,
+            "type": "movie",
+            "title": "The Marvels",
+            "targetMonth": "2026-10",
+            "path": "movies",
+            "order": 92
+        },
+        {
+            "tmdbId": 84958,
+            "type": "tv",
+            "title": "Loki",
+            "targetMonth": "2026-10",
+            "path": "essential",
+            "season": 2,
+            "order": 93
+        },
+        {
+            "tmdbId": 263115,
+            "type": "movie",
+            "title": "Logan",
+            "targetMonth": "2026-10",
+            "path": "essential",
+            "order": 94
+        },
+        {
+            "tmdbId": 383498,
+            "type": "movie",
+            "title": "Deadpool 2",
+            "targetMonth": "2026-10",
+            "path": "essential",
+            "order": 95
+        },
+        {
+            "tmdbId": 533535,
+            "type": "movie",
+            "title": "Deadpool & Wolverine",
+            "targetMonth": "2026-11",
+            "path": "essential",
+            "order": 96
+        },
+        {
+            "tmdbId": 138501,
+            "type": "tv",
+            "title": "Agatha All Along",
+            "targetMonth": "2026-11",
+            "path": "completionist",
+            "order": 97
+        },
+        {
+            "tmdbId": 202555,
+            "type": "tv",
+            "title": "Daredevil: Born Again",
+            "targetMonth": "2026-11",
+            "path": "essential",
+            "season": 1,
+            "order": 98
+        },
+        {
+            "tmdbId": 822119,
+            "type": "movie",
+            "title": "Captain America: Brave New World",
+            "targetMonth": "2026-11",
+            "path": "essential",
+            "order": 99
+        },
+        {
+            "tmdbId": 986056,
+            "type": "movie",
+            "title": "Thunderbolts*",
+            "targetMonth": "2026-11",
+            "path": "essential",
+            "order": 100
+        },
+        {
+            "tmdbId": 617126,
+            "type": "movie",
+            "title": "The Fantastic Four: First Steps",
+            "targetMonth": "2026-12",
+            "path": "essential",
+            "order": 101
+        },
+        {
+            "tmdbId": 202555,
+            "type": "tv",
+            "title": "Daredevil: Born Again",
+            "targetMonth": "2026-12",
+            "path": "essential",
+            "season": 2,
+            "order": 102
+        },
+        {
+            "tmdbId": 104157,
+            "type": "tv",
+            "title": "Wonder Man",
+            "targetMonth": "2026-12",
+            "path": "completionist",
+            "order": 103
+        },
+        {
+            "tmdbId": 0,
+            "type": "movie",
+            "title": "The Punisher (Special Presentation)",
+            "targetMonth": "2026-12",
+            "path": "completionist",
+            "order": 104,
+            "comingSoon": true
+        },
+        {
+            "tmdbId": 0,
+            "type": "movie",
+            "title": "Spider-Man: Brand New Day",
+            "targetMonth": "2026-12",
+            "path": "movies",
+            "order": 105,
+            "comingSoon": true
+        }
+    ]
+}

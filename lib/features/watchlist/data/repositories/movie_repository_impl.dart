@@ -9,29 +9,29 @@ import '../../domain/repositories/movie_repository.dart';
 import '../datasources/movie_local_data_source.dart';
 import '../datasources/tmdb_data_source.dart';
 
-class MovieRepositoryImpl implements MovieRepository {
+class WatchlistRepositoryImpl implements WatchlistRepository {
   final TmdbDataSource remoteDataSource;
-  final MovieLocalDataSource localDataSource;
+  final WatchlistLocalDataSource localDataSource;
 
-  MovieRepositoryImpl({
+  WatchlistRepositoryImpl({
     required this.remoteDataSource,
     required this.localDataSource,
   });
 
   @override
-  Future<Either<Failure, List<Movie>>> getMovies() async {
+  Future<Either<Failure, List<WatchlistItem>>> getWatchlist() async {
     try {
-      final hasCache = await localDataSource.hasMovies();
-      
+      final hasCache = await localDataSource.hasItems();
+
       if (hasCache) {
-        final cachedMovies = await localDataSource.getCachedMovies();
+        final cachedItems = await localDataSource.getCachedItems();
         _refreshFromRemote();
-        return Right(cachedMovies);
+        return Right(cachedItems);
       }
 
-      final remoteMovies = await remoteDataSource.getMcuMovies();
-      await localDataSource.cacheMovies(remoteMovies);
-      return Right(remoteMovies);
+      final remoteItems = await remoteDataSource.getWatchlist();
+      await localDataSource.cacheItems(remoteItems);
+      return Right(remoteItems);
     } on SocketException {
       return _fallbackToCache('No internet connection');
     } on ServerException catch (e) {
@@ -43,11 +43,12 @@ class MovieRepositoryImpl implements MovieRepository {
     }
   }
 
-  Future<Either<Failure, List<Movie>>> _fallbackToCache(String errorMessage) async {
+  Future<Either<Failure, List<WatchlistItem>>> _fallbackToCache(
+      String errorMessage) async {
     try {
-      final cachedMovies = await localDataSource.getCachedMovies();
-      if (cachedMovies.isNotEmpty) {
-        return Right(cachedMovies);
+      final cachedItems = await localDataSource.getCachedItems();
+      if (cachedItems.isNotEmpty) {
+        return Right(cachedItems);
       }
     } catch (_) {}
     return Left(NetworkFailure(errorMessage));
@@ -55,31 +56,31 @@ class MovieRepositoryImpl implements MovieRepository {
 
   Future<void> _refreshFromRemote() async {
     try {
-      final currentMovies = await localDataSource.getCachedMovies();
-      final watchedIds = currentMovies
-          .where((m) => m.isWatched)
-          .map((m) => m.id)
-          .toSet();
-
-      final remoteMovies = await remoteDataSource.getMcuMovies();
-      
-      for (final movie in remoteMovies) {
-        if (watchedIds.contains(movie.id)) {
-          movie.isWatched = true;
-        }
-      }
-      
-      await localDataSource.cacheMovies(remoteMovies);
+      final remoteItems = await remoteDataSource.getWatchlist();
+      await localDataSource.cacheItems(remoteItems);
     } catch (_) {}
   }
 
   @override
   Future<Either<Failure, void>> toggleWatchStatus(
-    int movieId,
+    String key,
     bool isWatched,
   ) async {
     try {
-      await localDataSource.updateWatchStatus(movieId, isWatched);
+      await localDataSource.updateWatchStatus(key, isWatched);
+      return const Right(null);
+    } on CacheException catch (e) {
+      return Left(CacheFailure(e.message));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> updateEpisodesWatched(
+    String key,
+    int episodesWatched,
+  ) async {
+    try {
+      await localDataSource.updateEpisodesWatched(key, episodesWatched);
       return const Right(null);
     } on CacheException catch (e) {
       return Left(CacheFailure(e.message));
@@ -89,22 +90,39 @@ class MovieRepositoryImpl implements MovieRepository {
   @override
   Future<Either<Failure, WatchProgress>> getWatchProgress() async {
     try {
-      final movies = await localDataSource.getCachedMovies();
-      
-      final totalMovies = movies.length;
-      final watchedMovies = movies.where((m) => m.isWatched).length;
-      final totalMinutes = movies.fold(0, (sum, m) => sum + m.runtime);
-      final watchedMinutes = movies
-          .where((m) => m.isWatched)
-          .fold(0, (sum, m) => sum + m.runtime);
+      final items = await localDataSource.getCachedItems();
+
+      final totalItems = items.length;
+      final watchedItems = items.where((m) => m.isWatched).length;
+      final totalMinutes = items.fold(0, (sum, m) => sum + m.runtime);
+
+      int watchedMinutes = 0;
+      int totalEpisodes = 0;
+      int watchedEpisodes = 0;
+
+      for (final item in items) {
+        if (item.isMovie) {
+          if (item.isWatched) watchedMinutes += item.runtime;
+        } else {
+          totalEpisodes += item.episodeCount;
+          watchedEpisodes += item.episodesWatched;
+          if (item.episodeCount > 0) {
+            final episodeRuntime = item.runtime ~/ item.episodeCount;
+            watchedMinutes += item.episodesWatched * episodeRuntime;
+          }
+        }
+      }
+
       final remainingMinutes = totalMinutes - watchedMinutes;
 
       return Right(WatchProgress(
-        totalMovies: totalMovies,
-        watchedMovies: watchedMovies,
+        totalItems: totalItems,
+        watchedItems: watchedItems,
         totalMinutes: totalMinutes,
         watchedMinutes: watchedMinutes,
         remainingMinutes: remainingMinutes,
+        totalEpisodes: totalEpisodes,
+        watchedEpisodes: watchedEpisodes,
       ));
     } on CacheException catch (e) {
       return Left(CacheFailure(e.message));

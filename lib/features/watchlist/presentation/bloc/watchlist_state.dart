@@ -17,31 +17,45 @@ class WatchlistLoading extends WatchlistState {
 }
 
 class WatchlistLoaded extends WatchlistState {
-  final List<Movie> movies;
+  final List<WatchlistItem> items;
   final WatchProgress progress;
   final String? activeFilter;
+  final int streak;
 
   const WatchlistLoaded({
-    required this.movies,
+    required this.items,
     required this.progress,
     this.activeFilter,
+    this.streak = 0,
   });
 
-  List<Movie> get filteredMovies {
-    if (activeFilter == null) return movies;
-    return movies.where((m) => m.watchPaths.contains(activeFilter)).toList();
+  List<WatchlistItem> get filteredItems {
+    if (activeFilter == null) return items;
+    return items.where((m) => m.watchPath == activeFilter).toList();
+  }
+
+  Map<String, List<WatchlistItem>> get itemsByMonth {
+    final result = <String, List<WatchlistItem>>{};
+    for (final item in filteredItems) {
+      result.putIfAbsent(item.targetMonth, () => []).add(item);
+    }
+    return Map.fromEntries(
+      result.entries.toList()..sort((a, b) => a.key.compareTo(b.key)),
+    );
   }
 
   WatchlistLoaded copyWith({
-    List<Movie>? movies,
+    List<WatchlistItem>? items,
     WatchProgress? progress,
     String? activeFilter,
     bool clearFilter = false,
+    int? streak,
   }) {
     return WatchlistLoaded(
-      movies: movies ?? this.movies,
+      items: items ?? this.items,
       progress: progress ?? this.progress,
       activeFilter: clearFilter ? null : (activeFilter ?? this.activeFilter),
+      streak: streak ?? this.streak,
     );
   }
 }

@@ -2,10 +2,12 @@ import 'package:hive/hive.dart';
 
 part 'movie.g.dart';
 
+enum ContentType { movie, tv }
+
 @HiveType(typeId: 0)
-class Movie extends HiveObject {
+class WatchlistItem extends HiveObject {
   @HiveField(0)
-  final int id;
+  final int tmdbId;
 
   @HiveField(1)
   final String title;
@@ -23,10 +25,10 @@ class Movie extends HiveObject {
   final String releaseDate;
 
   @HiveField(6)
-  final int phase;
+  final String targetMonth;
 
   @HiveField(7)
-  final List<String> watchPaths;
+  final String watchPath;
 
   @HiveField(8)
   bool isWatched;
@@ -34,46 +36,93 @@ class Movie extends HiveObject {
   @HiveField(9)
   final int order;
 
-  Movie({
-    required this.id,
+  @HiveField(10)
+  final int contentType;
+
+  @HiveField(11)
+  final int? season;
+
+  @HiveField(12)
+  final int episodeCount;
+
+  @HiveField(13)
+  int episodesWatched;
+
+  @HiveField(14)
+  final bool comingSoon;
+
+  WatchlistItem({
+    required this.tmdbId,
     required this.title,
     required this.runtime,
     this.posterPath,
     this.overview,
     required this.releaseDate,
-    required this.phase,
-    required this.watchPaths,
+    required this.targetMonth,
+    required this.watchPath,
     this.isWatched = false,
     required this.order,
+    required this.contentType,
+    this.season,
+    this.episodeCount = 0,
+    this.episodesWatched = 0,
+    this.comingSoon = false,
   });
+
+  ContentType get type =>
+      contentType == 0 ? ContentType.movie : ContentType.tv;
+
+  bool get isMovie => contentType == 0;
+  bool get isTvShow => contentType == 1;
 
   String get fullPosterUrl => posterPath != null
       ? 'https://image.tmdb.org/t/p/w500$posterPath'
       : '';
 
-  Movie copyWith({
-    int? id,
+  String get displayTitle =>
+      season != null ? '$title (Season $season)' : title;
+
+  double get progress {
+    if (isMovie) return isWatched ? 1.0 : 0.0;
+    if (episodeCount == 0) return 0.0;
+    return episodesWatched / episodeCount;
+  }
+
+  String get uniqueKey => season != null ? '${tmdbId}_s$season' : '$tmdbId';
+
+  WatchlistItem copyWith({
+    int? tmdbId,
     String? title,
     int? runtime,
     String? posterPath,
     String? overview,
     String? releaseDate,
-    int? phase,
-    List<String>? watchPaths,
+    String? targetMonth,
+    String? watchPath,
     bool? isWatched,
     int? order,
+    int? contentType,
+    int? season,
+    int? episodeCount,
+    int? episodesWatched,
+    bool? comingSoon,
   }) {
-    return Movie(
-      id: id ?? this.id,
+    return WatchlistItem(
+      tmdbId: tmdbId ?? this.tmdbId,
       title: title ?? this.title,
       runtime: runtime ?? this.runtime,
       posterPath: posterPath ?? this.posterPath,
       overview: overview ?? this.overview,
       releaseDate: releaseDate ?? this.releaseDate,
-      phase: phase ?? this.phase,
-      watchPaths: watchPaths ?? this.watchPaths,
+      targetMonth: targetMonth ?? this.targetMonth,
+      watchPath: watchPath ?? this.watchPath,
       isWatched: isWatched ?? this.isWatched,
       order: order ?? this.order,
+      contentType: contentType ?? this.contentType,
+      season: season ?? this.season,
+      episodeCount: episodeCount ?? this.episodeCount,
+      episodesWatched: episodesWatched ?? this.episodesWatched,
+      comingSoon: comingSoon ?? this.comingSoon,
     );
   }
 }

@@ -9,14 +9,14 @@ import 'features/watchlist/domain/entities/movie.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
+
   await dotenv.load(fileName: '.env');
-  
+
   await Hive.initFlutter();
-  Hive.registerAdapter(MovieAdapter());
-  
+  Hive.registerAdapter(WatchlistItemAdapter());
+
   await initDependencies();
-  
+
   runApp(const BeforeDoomApp());
 }
 

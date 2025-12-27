@@ -9,13 +9,23 @@ class WatchlistLoadRequested extends WatchlistEvent {
   const WatchlistLoadRequested();
 }
 
-class WatchlistMovieToggled extends WatchlistEvent {
-  final int movieId;
+class WatchlistItemToggled extends WatchlistEvent {
+  final String key;
   final bool isWatched;
 
-  const WatchlistMovieToggled({
-    required this.movieId,
+  const WatchlistItemToggled({
+    required this.key,
     required this.isWatched,
+  });
+}
+
+class WatchlistEpisodesUpdated extends WatchlistEvent {
+  final String key;
+  final int episodesWatched;
+
+  const WatchlistEpisodesUpdated({
+    required this.key,
+    required this.episodesWatched,
   });
 }
 
