@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../../../../core/util/status_rank.dart';
 import '../../domain/repositories/movie_repository.dart';
 
 class ProgressHeader extends StatelessWidget {
@@ -19,7 +18,6 @@ class ProgressHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final progressColor = _getProgressColor(theme);
-    final rank = StatusRank.fromProgress(progress.progressPercentage);
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -33,8 +31,6 @@ class ProgressHeader extends StatelessWidget {
       ),
       child: Column(
         children: [
-          _buildRankBadge(theme, rank),
-          const SizedBox(height: 16),
           Row(
             children: [
               Expanded(
@@ -152,91 +148,5 @@ class ProgressHeader extends StatelessWidget {
       'ahead' => 'Ahead of Schedule',
       _ => 'On Track',
     };
-  }
-
-  Widget _buildRankBadge(ThemeData theme, StatusRank rank) {
-    final nextRank = rank.nextRank;
-    final progressToNext = rank.progressToNextRank(progress.progressPercentage);
-
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            theme.colorScheme.primary.withValues(alpha: 0.1),
-            theme.colorScheme.secondary.withValues(alpha: 0.1),
-          ],
-        ),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: theme.colorScheme.primary.withValues(alpha: 0.3),
-        ),
-      ),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: theme.colorScheme.primary.withValues(alpha: 0.2),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(
-              rank.icon,
-              color: theme.colorScheme.primary,
-              size: 24,
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  rank.title.toUpperCase(),
-                  style: theme.textTheme.titleSmall?.copyWith(
-                    color: theme.colorScheme.primary,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 1.5,
-                  ),
-                ),
-                Text(
-                  rank.subtitle,
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
-                  ),
-                ),
-                if (nextRank != null) ...[
-                  const SizedBox(height: 6),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(4),
-                          child: LinearProgressIndicator(
-                            value: progressToNext,
-                            minHeight: 4,
-                            backgroundColor: theme.colorScheme.surface,
-                            valueColor: AlwaysStoppedAnimation(
-                              theme.colorScheme.secondary,
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Text(
-                        nextRank.title,
-                        style: theme.textTheme.labelSmall?.copyWith(
-                          color: theme.colorScheme.secondary,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
   }
 }

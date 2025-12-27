@@ -342,4 +342,160 @@ class _WatchlistViewState extends State<WatchlistView> {
 
     return '${months[monthNum - 1]} $year';
   }
+
+  Widget _buildProfileButton(BuildContext context, WatchProgress progress) {
+    final theme = Theme.of(context);
+    final rank = StatusRank.fromProgress(progress.progressPercentage);
+
+    return Padding(
+      padding: const EdgeInsets.only(right: 8),
+      child: IconButton(
+        onPressed: () => _showRankSheet(context, progress, rank),
+        icon: Container(
+          padding: const EdgeInsets.all(6),
+          decoration: BoxDecoration(
+            color: theme.colorScheme.primary.withValues(alpha: 0.2),
+            shape: BoxShape.circle,
+          ),
+          child: Icon(
+            rank.icon,
+            size: 20,
+            color: theme.colorScheme.primary,
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _showRankSheet(
+      BuildContext context, WatchProgress progress, StatusRank rank) {
+    final theme = Theme.of(context);
+    final nextRank = rank.nextRank;
+    final progressToNext = rank.progressToNextRank(progress.progressPercentage);
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: theme.colorScheme.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) => Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.2),
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            const SizedBox(height: 24),
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    theme.colorScheme.primary.withValues(alpha: 0.2),
+                    theme.colorScheme.secondary.withValues(alpha: 0.1),
+                  ],
+                ),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                rank.icon,
+                size: 48,
+                color: theme.colorScheme.primary,
+              ),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              rank.title.toUpperCase(),
+              style: theme.textTheme.headlineSmall?.copyWith(
+                color: theme.colorScheme.primary,
+                fontWeight: FontWeight.bold,
+                letterSpacing: 2,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              rank.subtitle,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+              ),
+            ),
+            const SizedBox(height: 24),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                _buildStatItem(
+                    theme, '${progress.watchedItems}', 'Watched'),
+                const SizedBox(width: 32),
+                _buildStatItem(theme,
+                    '${progress.progressPercentage.toStringAsFixed(0)}%', 'Complete'),
+                const SizedBox(width: 32),
+                _buildStatItem(theme,
+                    '${progress.hoursRemaining.toStringAsFixed(0)}h', 'Remaining'),
+              ],
+            ),
+            if (nextRank != null) ...[
+              const SizedBox(height: 24),
+              Row(
+                children: [
+                  Text(
+                    'Next: ${nextRank.title}',
+                    style: theme.textTheme.labelMedium?.copyWith(
+                      color: theme.colorScheme.secondary,
+                    ),
+                  ),
+                  const Spacer(),
+                  Text(
+                    '${(progressToNext * 100).toStringAsFixed(0)}%',
+                    style: theme.textTheme.labelMedium?.copyWith(
+                      color: theme.colorScheme.secondary,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(4),
+                child: LinearProgressIndicator(
+                  value: progressToNext,
+                  minHeight: 8,
+                  backgroundColor: theme.colorScheme.surfaceContainerHighest,
+                  valueColor:
+                      AlwaysStoppedAnimation(theme.colorScheme.secondary),
+                ),
+              ),
+            ],
+            const SizedBox(height: 24),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStatItem(ThemeData theme, String value, String label) {
+    return Column(
+      children: [
+        Text(
+          value,
+          style: theme.textTheme.titleLarge?.copyWith(
+            fontWeight: FontWeight.bold,
+            color: theme.colorScheme.onSurface,
+          ),
+        ),
+        Text(
+          label,
+          style: theme.textTheme.labelSmall?.copyWith(
+            color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+          ),
+        ),
+      ],
+    );
+  }
 }
