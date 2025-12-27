@@ -32,7 +32,7 @@ class TmdbDataSourceImpl implements TmdbDataSource {
     final data = jsonDecode(jsonStr) as Map<String, dynamic>;
     final jsonItems = data['items'] as List;
 
-    final items = <WatchlistItem>[];
+    final futures = <Future<WatchlistItem?>>[];
 
     for (final itemData in jsonItems) {
       final tmdbId = itemData['tmdbId'] as int;
@@ -40,29 +40,19 @@ class TmdbDataSourceImpl implements TmdbDataSource {
       final comingSoon = itemData['comingSoon'] == true;
 
       if (comingSoon || tmdbId == 0) {
-        items.add(_createComingSoonItem(itemData));
+        futures.add(Future.value(_createComingSoonItem(itemData)));
         continue;
       }
 
-      try {
-        WatchlistItem? item;
-        if (type == 'movie') {
-          item = await _fetchMovieDetails(itemData);
-        } else {
-          item = await _fetchTvDetails(itemData);
-        }
-
-        if (item != null) {
-          items.add(item);
-        }
-      } on SocketException {
-        throw const ServerException('No internet connection');
-      } on http.ClientException {
-        continue;
-      } catch (_) {
-        continue;
+      if (type == 'movie') {
+        futures.add(_fetchMovieDetails(itemData));
+      } else {
+        futures.add(_fetchTvDetails(itemData));
       }
     }
+
+    final results = await Future.wait(futures, eagerError: false);
+    final items = results.whereType<WatchlistItem>().toList();
 
     if (items.isEmpty) {
       throw const ServerException('Failed to fetch watchlist. Check your connection.');
@@ -86,6 +76,23 @@ class TmdbDataSourceImpl implements TmdbDataSource {
       contentType: itemData['type'] == 'movie' ? 0 : 1,
       season: itemData['season'] as int?,
       comingSoon: true,
+    );
+  }
+
+  WatchlistItem _createComingSoonItem(Map<String, dynamic> itemData) {
+    return WatchlistItem(
+      tmdbId: itemData['tmdbId'] as int? ?? 0,
+      title: itemData['title'] as String? ?? 'Coming Soon',
+      runtime: itemData['runtime'] as int? ?? 0,
+      posterPath: null,
+      overview: itemData['overview'] as String?,
+      releaseDate: itemData['releaseDate'] as String? ?? '',
+      targetMonth: itemData['targetMonth'] as String,
+      watchPath: itemData['path'] as String,
+      order: itemData['order'] as int,
+      contentType: itemData['type'] == 'movie' ? 0 : 1,
+      season: itemData['season'] as int?,
+      episodeCount: itemData['episodes'] as int?,
     );
   }
 
@@ -113,7 +120,7 @@ class TmdbDataSourceImpl implements TmdbDataSource {
         );
       }
       return null;
-    } on TimeoutException {
+    } catch (_) {
       return null;
     }
   }
@@ -163,7 +170,7 @@ class TmdbDataSourceImpl implements TmdbDataSource {
         season: season,
         episodeCount: episodeCount,
       );
-    } on TimeoutException {
+    } catch (_) {
       return null;
     }
   }

@@ -47,16 +47,19 @@ class WatchlistCard extends StatelessWidget {
                   ),
                 ),
                 if (!item.comingSoon)
-                  Padding(
-                    padding: const EdgeInsets.only(right: 8),
-                    child: Icon(
-                      item.isWatched
-                          ? Icons.check_circle
-                          : Icons.circle_outlined,
-                      color: item.isWatched
-                          ? theme.colorScheme.primary
-                          : theme.colorScheme.onSurface.withValues(alpha: 0.3),
-                      size: 28,
+                  GestureDetector(
+                    onTap: onToggle,
+                    child: Padding(
+                      padding: const EdgeInsets.all(12),
+                      child: Icon(
+                        item.isWatched
+                            ? Icons.check_circle
+                            : Icons.circle_outlined,
+                        color: item.isWatched
+                            ? theme.colorScheme.primary
+                            : theme.colorScheme.onSurface.withValues(alpha: 0.3),
+                        size: 28,
+                      ),
                     ),
                   ),
               ],
