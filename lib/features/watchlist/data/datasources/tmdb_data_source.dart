@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -76,23 +75,6 @@ class TmdbDataSourceImpl implements TmdbDataSource {
       contentType: itemData['type'] == 'movie' ? 0 : 1,
       season: itemData['season'] as int?,
       comingSoon: true,
-    );
-  }
-
-  WatchlistItem _createComingSoonItem(Map<String, dynamic> itemData) {
-    return WatchlistItem(
-      tmdbId: itemData['tmdbId'] as int? ?? 0,
-      title: itemData['title'] as String? ?? 'Coming Soon',
-      runtime: itemData['runtime'] as int? ?? 0,
-      posterPath: null,
-      overview: itemData['overview'] as String?,
-      releaseDate: itemData['releaseDate'] as String? ?? '',
-      targetMonth: itemData['targetMonth'] as String,
-      watchPath: itemData['path'] as String,
-      order: itemData['order'] as int,
-      contentType: itemData['type'] == 'movie' ? 0 : 1,
-      season: itemData['season'] as int?,
-      episodeCount: itemData['episodes'] as int?,
     );
   }
 
