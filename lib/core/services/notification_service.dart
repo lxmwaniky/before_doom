@@ -80,7 +80,15 @@ class NotificationService {
             .resolvePlatformSpecificImplementation<
               AndroidFlutterLocalNotificationsPlugin
             >();
-        return await android?.requestNotificationsPermission() ?? false;
+
+        // Request notification permission
+        final notifGranted =
+            await android?.requestNotificationsPermission() ?? false;
+
+        // Request exact alarm permission for scheduled notifications
+        await android?.requestExactAlarmsPermission();
+
+        return notifGranted;
       } else if (Platform.isIOS) {
         final ios = _notifications
             .resolvePlatformSpecificImplementation<
@@ -159,7 +167,7 @@ class NotificationService {
             presentSound: true,
           ),
         ),
-        androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
         matchDateTimeComponents: DateTimeComponents.time,
         uiLocalNotificationDateInterpretation:
             UILocalNotificationDateInterpretation.absoluteTime,

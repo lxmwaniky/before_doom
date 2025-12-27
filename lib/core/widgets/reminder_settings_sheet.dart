@@ -190,9 +190,51 @@ class _ReminderSettingsSheetState extends State<ReminderSettingsSheet> {
               ),
             ),
           ),
+          const SizedBox(height: 16),
+          SizedBox(
+            width: double.infinity,
+            child: OutlinedButton.icon(
+              onPressed: _sendTestNotification,
+              icon: const Icon(Icons.notifications),
+              label: const Text('Send Test Notification'),
+            ),
+          ),
           const SizedBox(height: 24),
         ],
       ),
     );
+  }
+
+  Future<void> _sendTestNotification() async {
+    try {
+      await _notificationService.init();
+      final granted = await _notificationService.requestPermission();
+
+      if (!granted) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Notification permission denied')),
+          );
+        }
+        return;
+      }
+
+      final success = await _notificationService.showTestNotification();
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              success ? 'Test notification sent!' : 'Failed to send',
+            ),
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error: $e')));
+      }
+    }
   }
 }

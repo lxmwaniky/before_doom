@@ -18,14 +18,45 @@ void main() async {
 
   await initDependencies();
 
-  // Non-blocking - notifications are optional
-  NotificationService().init();
+  // Initialize notifications
+  await NotificationService().init();
 
   runApp(const BeforeDoomApp());
 }
 
-class BeforeDoomApp extends StatelessWidget {
+class BeforeDoomApp extends StatefulWidget {
   const BeforeDoomApp({super.key});
+
+  @override
+  State<BeforeDoomApp> createState() => _BeforeDoomAppState();
+}
+
+class _BeforeDoomAppState extends State<BeforeDoomApp> {
+  @override
+  void initState() {
+    super.initState();
+    _requestNotificationPermissionOnFirstLaunch();
+  }
+
+  Future<void> _requestNotificationPermissionOnFirstLaunch() async {
+    final box = await Hive.openBox('app_settings');
+    final hasRequestedPermission = box.get(
+      'notification_permission_requested',
+      defaultValue: false,
+    );
+
+    if (!hasRequestedPermission) {
+      await Future.delayed(const Duration(seconds: 2));
+      final notificationService = NotificationService();
+      final granted = await notificationService.requestPermission();
+      await box.put('notification_permission_requested', true);
+
+      // Auto-enable daily reminder at 8 PM if permission granted
+      if (granted) {
+        await notificationService.scheduleDailyReminder(hour: 20, minute: 0);
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {

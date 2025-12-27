@@ -347,21 +347,27 @@ class _WatchlistViewState extends State<WatchlistView> {
     if (watchedItems == 0) return 'not_started';
     if (watchedItems == totalItems) return 'ahead';
 
-    // Calculate expected progress based on time elapsed
+    // Get current month in format "2025-12"
     final now = DateTime.now();
-    final doomsday = DateTime.utc(2026, 12, 18);
-    final startDate = DateTime.utc(2025, 12, 1);
+    final currentMonth = '${now.year}-${now.month.toString().padLeft(2, '0')}';
 
-    final totalDays = doomsday.difference(startDate).inDays;
-    final daysElapsed = now.difference(startDate).inDays;
+    // Get items scheduled for current month and earlier
+    final itemsDueByNow = items.where((item) {
+      return item.targetMonth.compareTo(currentMonth) <= 0;
+    }).toList();
 
-    if (daysElapsed <= 0 || totalDays <= 0) return 'on_track';
+    if (itemsDueByNow.isEmpty) return 'ahead';
 
-    final expectedProgress = (daysElapsed / totalDays * totalItems).floor();
-    final actualProgress = watchedItems;
+    final itemsDueWatched = itemsDueByNow
+        .where((item) => item.isWatched)
+        .length;
+    final itemsDueTotal = itemsDueByNow.length;
 
-    if (actualProgress < expectedProgress * 0.7) return 'behind';
-    if (actualProgress > expectedProgress * 1.2) return 'ahead';
+    // Calculate completion percentage for items due by now
+    final completionRate = itemsDueWatched / itemsDueTotal;
+
+    if (completionRate >= 1.0) return 'ahead';
+    if (completionRate < 0.7) return 'behind';
     return 'on_track';
   }
 
