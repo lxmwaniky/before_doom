@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
 import '../../domain/entities/movie.dart';
+import '../pages/item_detail_page.dart';
 
 class WatchlistCard extends StatelessWidget {
   final WatchlistItem item;
@@ -22,10 +23,7 @@ class WatchlistCard extends StatelessWidget {
     return Card(
       clipBehavior: Clip.antiAlias,
       child: InkWell(
-        onTap: item.comingSoon ? null : onToggle,
-        onLongPress: item.isTvShow && !item.comingSoon
-            ? () => _showEpisodeDialog(context)
-            : null,
+        onTap: () => _openDetails(context),
         child: Stack(
           children: [
             Row(
@@ -40,20 +38,27 @@ class WatchlistCard extends StatelessWidget {
                         _buildTitle(theme),
                         const SizedBox(height: 4),
                         _buildSubtitle(theme),
-                        const SizedBox(height: 4),
-                        _buildProgress(theme),
+                        if (item.isTvShow && !item.comingSoon) ...[
+                          const SizedBox(height: 8),
+                          _buildEpisodeProgress(theme),
+                        ],
                       ],
                     ),
                   ),
                 ),
-                if (!item.comingSoon) ...[
-                  Checkbox(
-                    value: item.isWatched,
-                    onChanged: (_) => onToggle(),
-                    activeColor: theme.colorScheme.primary,
+                if (!item.comingSoon)
+                  Padding(
+                    padding: const EdgeInsets.only(right: 8),
+                    child: Icon(
+                      item.isWatched
+                          ? Icons.check_circle
+                          : Icons.circle_outlined,
+                      color: item.isWatched
+                          ? theme.colorScheme.primary
+                          : theme.colorScheme.onSurface.withValues(alpha: 0.3),
+                      size: 28,
+                    ),
                   ),
-                  const SizedBox(width: 8),
-                ],
               ],
             ),
             if (item.comingSoon) _buildComingSoonBadge(theme),
@@ -63,19 +68,28 @@ class WatchlistCard extends StatelessWidget {
     );
   }
 
+  void _openDetails(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => ItemDetailPage(
+          item: item,
+          onToggle: onToggle,
+          onEpisodesChanged: onEpisodesChanged,
+        ),
+      ),
+    );
+  }
+
   Widget _buildPoster(ThemeData theme) {
     return SizedBox(
-      width: 80,
-      height: 120,
+      width: 70,
+      height: 100,
       child: item.fullPosterUrl.isNotEmpty
           ? CachedNetworkImage(
               imageUrl: item.fullPosterUrl,
               fit: BoxFit.cover,
               placeholder: (_, __) => Container(
                 color: theme.colorScheme.surfaceContainer,
-                child: const Center(
-                  child: CircularProgressIndicator(strokeWidth: 2),
-                ),
               ),
               errorWidget: (_, __, ___) => _buildPlaceholder(theme),
             )
@@ -109,59 +123,30 @@ class WatchlistCard extends StatelessWidget {
   }
 
   Widget _buildSubtitle(ThemeData theme) {
-    final typeLabel = item.isTvShow ? 'TV Series' : 'Movie';
-    final pathLabel = item.watchPath[0].toUpperCase() + item.watchPath.substring(1);
+    final text = item.isMovie
+        ? '${item.runtime} min'
+        : '${item.episodeCount} episodes';
 
-    return Row(
-      children: [
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-          decoration: BoxDecoration(
-            color: theme.colorScheme.secondaryContainer,
-            borderRadius: BorderRadius.circular(4),
-          ),
-          child: Text(
-            typeLabel,
-            style: theme.textTheme.labelSmall?.copyWith(
-              color: theme.colorScheme.onSecondaryContainer,
-            ),
-          ),
-        ),
-        const SizedBox(width: 8),
-        Text(
-          pathLabel,
-          style: theme.textTheme.bodySmall?.copyWith(
-            color: theme.colorScheme.secondary,
-          ),
-        ),
-      ],
+    return Text(
+      text,
+      style: theme.textTheme.bodySmall?.copyWith(
+        color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+      ),
     );
   }
 
-  Widget _buildProgress(ThemeData theme) {
-    if (item.isMovie) {
-      return Text(
-        '${item.runtime} min',
-        style: theme.textTheme.bodySmall?.copyWith(
-          color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
-        ),
-      );
-    }
+  Widget _buildEpisodeProgress(ThemeData theme) {
+    final progress = item.episodeCount > 0
+        ? item.episodesWatched / item.episodeCount
+        : 0.0;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          '${item.episodesWatched}/${item.episodeCount} episodes',
-          style: theme.textTheme.bodySmall?.copyWith(
-            color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
-          ),
-        ),
-        const SizedBox(height: 4),
         ClipRRect(
           borderRadius: BorderRadius.circular(2),
           child: LinearProgressIndicator(
-            value: item.progress,
+            value: progress,
             backgroundColor: theme.colorScheme.surfaceContainerHighest,
             valueColor: AlwaysStoppedAnimation(
               item.isWatched
@@ -169,6 +154,13 @@ class WatchlistCard extends StatelessWidget {
                   : theme.colorScheme.secondary,
             ),
             minHeight: 4,
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          '${item.episodesWatched}/${item.episodeCount}',
+          style: theme.textTheme.labelSmall?.copyWith(
+            color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
           ),
         ),
       ],
@@ -193,71 +185,6 @@ class WatchlistCard extends StatelessWidget {
           ),
         ),
       ),
-    );
-  }
-
-  void _showEpisodeDialog(BuildContext context) {
-    final theme = Theme.of(context);
-
-    showDialog(
-      context: context,
-      builder: (dialogContext) {
-        int currentEpisodes = item.episodesWatched;
-
-        return StatefulBuilder(
-          builder: (context, setState) {
-            return AlertDialog(
-              title: Text(item.displayTitle),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    'Episodes Watched',
-                    style: theme.textTheme.bodyMedium,
-                  ),
-                  const SizedBox(height: 16),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      IconButton(
-                        onPressed: currentEpisodes > 0
-                            ? () => setState(() => currentEpisodes--)
-                            : null,
-                        icon: const Icon(Icons.remove_circle_outline),
-                      ),
-                      const SizedBox(width: 16),
-                      Text(
-                        '$currentEpisodes / ${item.episodeCount}',
-                        style: theme.textTheme.headlineSmall,
-                      ),
-                      const SizedBox(width: 16),
-                      IconButton(
-                        onPressed: currentEpisodes < item.episodeCount
-                            ? () => setState(() => currentEpisodes++)
-                            : null,
-                        icon: const Icon(Icons.add_circle_outline),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(dialogContext),
-                  child: const Text('Cancel'),
-                ),
-                FilledButton(
-                  onPressed: () {
-                    onEpisodesChanged?.call(currentEpisodes);
-                    Navigator.pop(dialogContext);
-                  },
-                  child: const Text('Save'),
-                ),
-              ],
-            );
-          },
-        );
-      },
     );
   }
 }

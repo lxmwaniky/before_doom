@@ -28,7 +28,9 @@ class BeforeDoomApp extends StatelessWidget {
     return MaterialApp(
       title: 'Before Doom',
       debugShowCheckedModeBanner: false,
-      theme: AppTheme.darkTheme,
+      theme: AppTheme.lightTheme,
+      darkTheme: AppTheme.darkTheme,
+      themeMode: ThemeMode.system,
       home: const AppShell(),
     );
   }

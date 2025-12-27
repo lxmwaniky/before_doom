@@ -69,8 +69,8 @@ class WatchlistView extends StatelessWidget {
             WatchlistLoaded(
               :final progress,
               :final itemsByMonth,
-              :final activeFilter,
-              :final streak
+              :final streak,
+              :final items
             ) =>
               RefreshIndicator(
                 onRefresh: () async {
@@ -83,22 +83,10 @@ class WatchlistView extends StatelessWidget {
                     SliverToBoxAdapter(
                       child: Padding(
                         padding: const EdgeInsets.all(16),
-                        child: Column(
-                          children: [
-                            ProgressHeader(
-                              progress: progress,
-                              streak: streak,
-                            ),
-                            const SizedBox(height: 16),
-                            FilterChips(
-                              activeFilter: activeFilter,
-                              onFilterChanged: (filter) {
-                                context.read<WatchlistBloc>().add(
-                                      WatchlistFilterChanged(filter),
-                                    );
-                              },
-                            ),
-                          ],
+                        child: ProgressHeader(
+                          progress: progress,
+                          streak: streak,
+                          scheduleStatus: _calculateScheduleStatus(items),
                         ),
                       ),
                     ),
@@ -116,6 +104,30 @@ class WatchlistView extends StatelessWidget {
     );
   }
 
+  String _calculateScheduleStatus(List<WatchlistItem> items) {
+    final now = DateTime.now();
+    final currentMonth = '${now.year}-${now.month.toString().padLeft(2, '0')}';
+
+    int shouldBeWatched = 0;
+    int actuallyWatched = 0;
+
+    for (final item in items) {
+      if (item.targetMonth.compareTo(currentMonth) <= 0) {
+        shouldBeWatched++;
+        if (item.isWatched) actuallyWatched++;
+      }
+    }
+
+    if (shouldBeWatched == 0) return 'on_track';
+
+    final expectedProgress = shouldBeWatched;
+    final actualProgress = actuallyWatched;
+
+    if (actualProgress < expectedProgress * 0.8) return 'behind';
+    if (actualProgress > expectedProgress) return 'ahead';
+    return 'on_track';
+  }
+
   List<Widget> _buildMonthSection(
     BuildContext context,
     String month,
@@ -123,23 +135,17 @@ class WatchlistView extends StatelessWidget {
   ) {
     final theme = Theme.of(context);
     final monthLabel = _formatMonth(month);
-    final status = _getMonthStatus(month);
 
     return [
       SliverToBoxAdapter(
         child: Padding(
           padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-          child: Row(
-            children: [
-              Text(
-                monthLabel,
-                style: theme.textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(width: 8),
-              _buildStatusBadge(context, status),
-            ],
+          child: Text(
+            monthLabel,
+            style: theme.textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.8),
+            ),
           ),
         ),
       ),
@@ -203,38 +209,5 @@ class WatchlistView extends StatelessWidget {
     ];
 
     return '${months[monthNum - 1]} $year';
-  }
-
-  String _getMonthStatus(String targetMonth) {
-    final now = DateTime.now();
-    final currentMonth = '${now.year}-${now.month.toString().padLeft(2, '0')}';
-
-    if (targetMonth.compareTo(currentMonth) < 0) return 'past';
-    if (targetMonth == currentMonth) return 'current';
-    return 'future';
-  }
-
-  Widget _buildStatusBadge(BuildContext context, String status) {
-    final theme = Theme.of(context);
-
-    final (color, text) = switch (status) {
-      'past' => (theme.colorScheme.error, 'Past Due'),
-      'current' => (theme.colorScheme.primary, 'This Month'),
-      _ => (theme.colorScheme.surfaceContainerHighest, 'Upcoming'),
-    };
-
-    if (status == 'future') return const SizedBox.shrink();
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.2),
-        borderRadius: BorderRadius.circular(4),
-      ),
-      child: Text(
-        text,
-        style: theme.textTheme.labelSmall?.copyWith(color: color),
-      ),
-    );
   }
 }
