@@ -14,7 +14,6 @@ class ReminderSettingsSheet extends StatefulWidget {
 class _ReminderSettingsSheetState extends State<ReminderSettingsSheet> {
   final _notificationService = NotificationService();
   bool _isEnabled = false;
-  bool _hasPermission = false;
   TimeOfDay _selectedTime = const TimeOfDay(hour: 20, minute: 0);
   bool _isLoading = true;
 
@@ -33,32 +32,6 @@ class _ReminderSettingsSheetState extends State<ReminderSettingsSheet> {
       _selectedTime = settings.timeOfDay;
       _isLoading = false;
     });
-  }
-
-  Future<void> _requestPermission() async {
-    setState(() => _isLoading = true);
-
-    final granted = await _notificationService.requestPermission();
-
-    setState(() {
-      _hasPermission = granted;
-      _isLoading = false;
-    });
-
-    if (granted && mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Notifications enabled! You can now set reminders.'),
-          backgroundColor: Colors.green,
-        ),
-      );
-    } else if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Permission denied. Please enable in device settings.'),
-        ),
-      );
-    }
   }
 
   Future<void> _toggleReminder(bool enabled) async {
@@ -199,21 +172,6 @@ class _ReminderSettingsSheetState extends State<ReminderSettingsSheet> {
             ),
           ),
           const SizedBox(height: 16),
-
-          // Permission request button - shown first
-          if (!_isEnabled && !_hasPermission)
-            Container(
-              width: double.infinity,
-              margin: const EdgeInsets.only(bottom: 16),
-              child: FilledButton.icon(
-                onPressed: _requestPermission,
-                icon: const Icon(Icons.notifications),
-                label: const Text('Allow Notifications'),
-                style: FilledButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                ),
-              ),
-            ),
 
           Container(
             decoration: BoxDecoration(

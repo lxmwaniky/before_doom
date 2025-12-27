@@ -66,6 +66,7 @@ class WatchlistCard extends StatelessWidget {
                           title: item.title,
                           isTvShow: item.isTvShow,
                           season: item.season,
+                          posterPath: item.posterPath,
                         );
                       }
                     },

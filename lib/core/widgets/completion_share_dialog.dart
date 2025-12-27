@@ -75,18 +75,45 @@ class CompletionShareDialog extends StatelessWidget {
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: theme.colorScheme.primary.withValues(alpha: 0.1),
-              shape: BoxShape.circle,
+          if (posterPath != null)
+            ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: CachedNetworkImage(
+                imageUrl: 'https://image.tmdb.org/t/p/w300$posterPath',
+                width: 120,
+                height: 180,
+                fit: BoxFit.cover,
+                placeholder: (_, __) => Container(
+                  width: 120,
+                  height: 180,
+                  color: theme.colorScheme.surfaceContainerHighest,
+                  child: const Center(child: CircularProgressIndicator()),
+                ),
+                errorWidget: (_, __, ___) => Container(
+                  width: 120,
+                  height: 180,
+                  color: theme.colorScheme.surfaceContainerHighest,
+                  child: Icon(
+                    Icons.movie,
+                    size: 48,
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.3),
+                  ),
+                ),
+              ),
+            )
+          else
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: theme.colorScheme.primary.withValues(alpha: 0.1),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.check_circle,
+                color: theme.colorScheme.primary,
+                size: 48,
+              ),
             ),
-            child: Icon(
-              Icons.check_circle,
-              color: theme.colorScheme.primary,
-              size: 48,
-            ),
-          ),
           const SizedBox(height: 16),
           Text(
             'Nice!',
@@ -107,20 +134,30 @@ class CompletionShareDialog extends StatelessWidget {
               color: theme.colorScheme.surfaceContainerHighest,
               borderRadius: BorderRadius.circular(12),
             ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+            child: Column(
               children: [
-                Icon(Icons.timer, color: theme.colorScheme.primary, size: 20),
-                const SizedBox(width: 8),
-                Text(
-                  '$hours hours',
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    color: theme.colorScheme.primary,
-                    fontWeight: FontWeight.bold,
-                  ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.timer,
+                      color: theme.colorScheme.primary,
+                      size: 20,
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      '$hours hours',
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        color: theme.colorScheme.primary,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
                 ),
+                const SizedBox(height: 4),
                 Text(
-                  ' ($days days) to Doomsday',
+                  '($days days) to Doomsday',
                   style: theme.textTheme.bodyMedium?.copyWith(
                     color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
                   ),

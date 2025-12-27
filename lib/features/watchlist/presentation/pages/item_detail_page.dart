@@ -238,6 +238,7 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
               title: widget.item.title,
               isTvShow: widget.item.isTvShow,
               season: widget.item.season,
+              posterPath: widget.item.posterPath,
             );
           }
         },
