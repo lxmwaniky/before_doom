@@ -3,6 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/di/injection_container.dart';
 import '../../../../core/util/status_rank.dart';
+import '../../../../core/widgets/reminder_settings_sheet.dart';
+import '../../../../core/widgets/share_progress_card.dart';
 import '../../domain/entities/movie.dart';
 import '../../domain/repositories/movie_repository.dart';
 import '../bloc/watchlist_bloc.dart';
@@ -31,6 +33,7 @@ class WatchlistView extends StatefulWidget {
 
 class _WatchlistViewState extends State<WatchlistView> {
   final _searchController = TextEditingController();
+  final _shareCardKey = GlobalKey();
   String _searchQuery = '';
 
   @override
@@ -350,7 +353,17 @@ class _WatchlistViewState extends State<WatchlistView> {
     return Padding(
       padding: const EdgeInsets.only(right: 8),
       child: IconButton(
-        onPressed: () => _showRankSheet(context, progress, rank),
+        onPressed: () {
+          final state = context.read<WatchlistBloc>().state;
+          String? nextMovie;
+          if (state is WatchlistLoaded) {
+            final unwatched = state.items.where((i) => !i.isWatched && !i.comingSoon).toList();
+            if (unwatched.isNotEmpty) {
+              nextMovie = unwatched.first.title;
+            }
+          }
+          _showRankSheet(context, progress, rank, nextMovie);
+        },
         icon: Container(
           padding: const EdgeInsets.all(6),
           decoration: BoxDecoration(
@@ -368,10 +381,11 @@ class _WatchlistViewState extends State<WatchlistView> {
   }
 
   void _showRankSheet(
-      BuildContext context, WatchProgress progress, StatusRank rank) {
+      BuildContext context, WatchProgress progress, StatusRank rank, String? nextMovie) {
     final theme = Theme.of(context);
     final nextRank = rank.nextRank;
     final progressToNext = rank.progressToNextRank(progress.progressPercentage);
+    final daysUntilDoomsday = DateTime(2026, 12, 18).difference(DateTime.now()).inDays;
 
     showModalBottomSheet(
       context: context,
@@ -473,6 +487,88 @@ class _WatchlistViewState extends State<WatchlistView> {
               ),
             ],
             const SizedBox(height: 24),
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed: () {
+                      Navigator.pop(context);
+                      _showRemindersSheet(context, nextMovie);
+                    },
+                    icon: const Icon(Icons.notifications_outlined),
+                    label: const Text('Reminders'),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: FilledButton.icon(
+                    onPressed: () {
+                      Navigator.pop(context);
+                      _showShareSheet(context, progress, daysUntilDoomsday);
+                    },
+                    icon: const Icon(Icons.share),
+                    label: const Text('Share'),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showRemindersSheet(BuildContext context, String? nextMovie) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (_) => ReminderSettingsSheet(nextMovieTitle: nextMovie),
+    );
+  }
+
+  void _showShareSheet(BuildContext context, WatchProgress progress, int daysRemaining) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (_) => Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.2),
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            const SizedBox(height: 24),
+            ShareProgressCard(
+              progress: progress,
+              daysRemaining: daysRemaining,
+              repaintKey: _shareCardKey,
+            ),
+            const SizedBox(height: 24),
+            SizedBox(
+              width: double.infinity,
+              child: FilledButton.icon(
+                onPressed: () async {
+                  await ShareService.shareProgress(repaintKey: _shareCardKey);
+                },
+                icon: const Icon(Icons.share),
+                label: const Text('Share Progress'),
+              ),
+            ),
+            const SizedBox(height: 16),
           ],
         ),
       ),

@@ -3,6 +3,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 import 'core/di/injection_container.dart';
+import 'core/services/notification_service.dart';
 import 'core/theme/theme.dart';
 import 'core/widgets/app_shell.dart';
 import 'features/watchlist/domain/entities/movie.dart';
@@ -16,6 +17,8 @@ void main() async {
   Hive.registerAdapter(WatchlistItemAdapter());
 
   await initDependencies();
+
+  await NotificationService().init();
 
   runApp(const BeforeDoomApp());
 }
