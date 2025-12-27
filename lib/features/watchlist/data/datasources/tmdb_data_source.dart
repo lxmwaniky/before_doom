@@ -10,6 +10,7 @@ import '../../domain/entities/movie.dart';
 
 abstract class TmdbDataSource {
   Future<List<WatchlistItem>> getWatchlist();
+  Future<int> getJsonVersion();
 }
 
 class TmdbDataSourceImpl implements TmdbDataSource {
@@ -20,6 +21,13 @@ class TmdbDataSourceImpl implements TmdbDataSource {
   TmdbDataSourceImpl({required this.client});
 
   String get _apiKey => dotenv.env['TMDB_API_KEY'] ?? '';
+
+  @override
+  Future<int> getJsonVersion() async {
+    final jsonStr = await rootBundle.loadString('assets/marvel_watchlist.json');
+    final data = jsonDecode(jsonStr) as Map<String, dynamic>;
+    return data['version'] as int? ?? 1;
+  }
 
   @override
   Future<List<WatchlistItem>> getWatchlist() async {
@@ -54,7 +62,9 @@ class TmdbDataSourceImpl implements TmdbDataSource {
     final items = results.whereType<WatchlistItem>().toList();
 
     if (items.isEmpty) {
-      throw const ServerException('Failed to fetch watchlist. Check your connection.');
+      throw const ServerException(
+        'Failed to fetch watchlist. Check your connection.',
+      );
     }
 
     items.sort((a, b) => a.order.compareTo(b.order));
@@ -78,7 +88,9 @@ class TmdbDataSourceImpl implements TmdbDataSource {
     );
   }
 
-  Future<WatchlistItem?> _fetchMovieDetails(Map<String, dynamic> itemData) async {
+  Future<WatchlistItem?> _fetchMovieDetails(
+    Map<String, dynamic> itemData,
+  ) async {
     final tmdbId = itemData['tmdbId'] as int;
 
     try {
@@ -134,7 +146,8 @@ class TmdbDataSourceImpl implements TmdbDataSource {
             episodeCount += s['episode_count'] as int? ?? 0;
           }
         }
-        runtime = (json['episode_run_time'] as List?)?.firstOrNull as int? ?? 45;
+        runtime =
+            (json['episode_run_time'] as List?)?.firstOrNull as int? ?? 45;
         runtime *= episodeCount;
       }
 
@@ -157,10 +170,15 @@ class TmdbDataSourceImpl implements TmdbDataSource {
     }
   }
 
-  Future<Map<String, dynamic>> _fetchSeasonDetails(int tvId, int seasonNum) async {
+  Future<Map<String, dynamic>> _fetchSeasonDetails(
+    int tvId,
+    int seasonNum,
+  ) async {
     try {
       final response = await client
-          .get(Uri.parse('$_baseUrl/tv/$tvId/season/$seasonNum?api_key=$_apiKey'))
+          .get(
+            Uri.parse('$_baseUrl/tv/$tvId/season/$seasonNum?api_key=$_apiKey'),
+          )
           .timeout(_timeout);
 
       if (response.statusCode == 200) {

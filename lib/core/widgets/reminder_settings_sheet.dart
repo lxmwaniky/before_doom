@@ -5,10 +5,7 @@ import '../services/notification_service.dart';
 class ReminderSettingsSheet extends StatefulWidget {
   final String? nextMovieTitle;
 
-  const ReminderSettingsSheet({
-    super.key,
-    this.nextMovieTitle,
-  });
+  const ReminderSettingsSheet({super.key, this.nextMovieTitle});
 
   @override
   State<ReminderSettingsSheet> createState() => _ReminderSettingsSheetState();
@@ -30,7 +27,7 @@ class _ReminderSettingsSheetState extends State<ReminderSettingsSheet> {
   Future<void> _loadSettings() async {
     final settings = await _notificationService.getReminderSettings();
     await _notificationService.init();
-    
+
     setState(() {
       _isEnabled = settings.enabled;
       _selectedTime = settings.timeOfDay;
@@ -40,9 +37,9 @@ class _ReminderSettingsSheetState extends State<ReminderSettingsSheet> {
 
   Future<void> _requestPermission() async {
     setState(() => _isLoading = true);
-    
+
     final granted = await _notificationService.requestPermission();
-    
+
     setState(() {
       _hasPermission = granted;
       _isLoading = false;
@@ -87,9 +84,7 @@ class _ReminderSettingsSheetState extends State<ReminderSettingsSheet> {
 
         if (!success && mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Failed to schedule reminder'),
-            ),
+            const SnackBar(content: Text('Failed to schedule reminder')),
           );
           return;
         }
@@ -100,9 +95,9 @@ class _ReminderSettingsSheetState extends State<ReminderSettingsSheet> {
       setState(() => _isEnabled = enabled);
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Something went wrong')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Something went wrong')));
       }
     }
   }
@@ -133,9 +128,9 @@ class _ReminderSettingsSheetState extends State<ReminderSettingsSheet> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Something went wrong')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Something went wrong')));
       }
     }
   }
@@ -169,7 +164,7 @@ class _ReminderSettingsSheetState extends State<ReminderSettingsSheet> {
       return const Center(child: CircularProgressIndicator());
     }
 
-    return Padding(
+    return SingleChildScrollView(
       padding: const EdgeInsets.all(24),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -182,13 +177,13 @@ class _ReminderSettingsSheetState extends State<ReminderSettingsSheet> {
               borderRadius: BorderRadius.circular(2),
             ),
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 16),
           Icon(
             Icons.notifications_active,
             size: 48,
             color: theme.colorScheme.primary,
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 12),
           Text(
             'Watch Reminders',
             style: theme.textTheme.titleLarge?.copyWith(
@@ -203,8 +198,8 @@ class _ReminderSettingsSheetState extends State<ReminderSettingsSheet> {
               color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
             ),
           ),
-          const SizedBox(height: 24),
-          
+          const SizedBox(height: 16),
+
           // Permission request button - shown first
           if (!_isEnabled && !_hasPermission)
             Container(
@@ -219,7 +214,7 @@ class _ReminderSettingsSheetState extends State<ReminderSettingsSheet> {
                 ),
               ),
             ),
-          
+
           Container(
             decoration: BoxDecoration(
               color: theme.colorScheme.surfaceContainerHighest,
@@ -227,9 +222,7 @@ class _ReminderSettingsSheetState extends State<ReminderSettingsSheet> {
             ),
             child: SwitchListTile(
               title: const Text('Daily Reminder'),
-              subtitle: Text(
-                _isEnabled ? 'Enabled' : 'Disabled',
-              ),
+              subtitle: Text(_isEnabled ? 'Enabled' : 'Disabled'),
               value: _isEnabled,
               onChanged: _toggleReminder,
             ),
@@ -260,14 +253,14 @@ class _ReminderSettingsSheetState extends State<ReminderSettingsSheet> {
               ),
             ),
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 16),
           if (_isEnabled)
             TextButton.icon(
               onPressed: _sendTestNotification,
               icon: const Icon(Icons.send),
               label: const Text('Send Test Notification'),
             ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 8),
         ],
       ),
     );

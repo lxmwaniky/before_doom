@@ -21,16 +21,23 @@ class WatchlistRepositoryImpl implements WatchlistRepository {
   @override
   Future<Either<Failure, List<WatchlistItem>>> getWatchlist() async {
     try {
+      final jsonVersion = await remoteDataSource.getJsonVersion();
+      final cachedVersion = await localDataSource.getCachedVersion();
       final hasCache = await localDataSource.hasItems();
 
-      if (hasCache) {
+      if (hasCache && cachedVersion == jsonVersion) {
         final cachedItems = await localDataSource.getCachedItems();
         _refreshFromRemote();
         return Right(cachedItems);
       }
 
+      if (cachedVersion != jsonVersion) {
+        await localDataSource.clearCache();
+      }
+
       final remoteItems = await remoteDataSource.getWatchlist();
       await localDataSource.cacheItems(remoteItems);
+      await localDataSource.setCachedVersion(jsonVersion);
       return Right(remoteItems);
     } on SocketException {
       return _fallbackToCache('No internet connection');
@@ -44,7 +51,8 @@ class WatchlistRepositoryImpl implements WatchlistRepository {
   }
 
   Future<Either<Failure, List<WatchlistItem>>> _fallbackToCache(
-      String errorMessage) async {
+    String errorMessage,
+  ) async {
     try {
       final cachedItems = await localDataSource.getCachedItems();
       if (cachedItems.isNotEmpty) {
@@ -56,8 +64,16 @@ class WatchlistRepositoryImpl implements WatchlistRepository {
 
   Future<void> _refreshFromRemote() async {
     try {
+      final jsonVersion = await remoteDataSource.getJsonVersion();
+      final cachedVersion = await localDataSource.getCachedVersion();
+
+      if (cachedVersion != jsonVersion) {
+        await localDataSource.clearCache();
+      }
+
       final remoteItems = await remoteDataSource.getWatchlist();
       await localDataSource.cacheItems(remoteItems);
+      await localDataSource.setCachedVersion(jsonVersion);
     } catch (_) {}
   }
 
@@ -115,15 +131,17 @@ class WatchlistRepositoryImpl implements WatchlistRepository {
 
       final remainingMinutes = totalMinutes - watchedMinutes;
 
-      return Right(WatchProgress(
-        totalItems: totalItems,
-        watchedItems: watchedItems,
-        totalMinutes: totalMinutes,
-        watchedMinutes: watchedMinutes,
-        remainingMinutes: remainingMinutes,
-        totalEpisodes: totalEpisodes,
-        watchedEpisodes: watchedEpisodes,
-      ));
+      return Right(
+        WatchProgress(
+          totalItems: totalItems,
+          watchedItems: watchedItems,
+          totalMinutes: totalMinutes,
+          watchedMinutes: watchedMinutes,
+          remainingMinutes: remainingMinutes,
+          totalEpisodes: totalEpisodes,
+          watchedEpisodes: watchedEpisodes,
+        ),
+      );
     } on CacheException catch (e) {
       return Left(CacheFailure(e.message));
     }

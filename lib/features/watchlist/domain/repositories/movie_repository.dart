@@ -5,8 +5,14 @@ import '../../domain/entities/movie.dart';
 
 abstract class WatchlistRepository {
   Future<Either<Failure, List<WatchlistItem>>> getWatchlist();
-  Future<Either<Failure, void>> toggleWatchStatus(String key, bool isWatched);
-  Future<Either<Failure, void>> updateEpisodesWatched(String key, int episodesWatched);
+  Future<Either<Failure, void>> toggleWatchStatus(
+    String key,
+    bool isWatched,
+  );
+  Future<Either<Failure, void>> updateEpisodesWatched(
+    String key,
+    int episodesWatched,
+  );
   Future<Either<Failure, WatchProgress>> getWatchProgress();
 }
 

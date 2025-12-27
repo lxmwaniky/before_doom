@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../core/util/haptic_service.dart';
+import '../../../../core/widgets/completion_share_dialog.dart';
 import '../../domain/entities/movie.dart';
 import '../pages/item_detail_page.dart';
 
@@ -52,12 +53,21 @@ class WatchlistCard extends StatelessWidget {
                 if (!item.comingSoon)
                   GestureDetector(
                     onTap: () {
-                      if (!item.isWatched) {
+                      final wasNotWatched = !item.isWatched;
+                      if (wasNotWatched) {
                         HapticService.missionComplete();
                       } else {
                         HapticService.lightTap();
                       }
                       onToggle();
+                      if (wasNotWatched) {
+                        CompletionShareDialog.show(
+                          context,
+                          title: item.title,
+                          isTvShow: item.isTvShow,
+                          season: item.season,
+                        );
+                      }
                     },
                     child: Padding(
                       padding: const EdgeInsets.all(12),
@@ -67,7 +77,9 @@ class WatchlistCard extends StatelessWidget {
                             : Icons.circle_outlined,
                         color: item.isWatched
                             ? theme.colorScheme.primary
-                            : theme.colorScheme.onSurface.withValues(alpha: 0.3),
+                            : theme.colorScheme.onSurface.withValues(
+                                alpha: 0.3,
+                              ),
                         size: 28,
                       ),
                     ),
@@ -102,9 +114,8 @@ class WatchlistCard extends StatelessWidget {
           ? CachedNetworkImage(
               imageUrl: item.fullPosterUrl,
               fit: BoxFit.cover,
-              placeholder: (_, __) => Container(
-                color: theme.colorScheme.surfaceContainer,
-              ),
+              placeholder: (_, __) =>
+                  Container(color: theme.colorScheme.surfaceContainer),
               errorWidget: (_, __, ___) => _buildPlaceholder(theme),
             )
           : _buildPlaceholder(theme),

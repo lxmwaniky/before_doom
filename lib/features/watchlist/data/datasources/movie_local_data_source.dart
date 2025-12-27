@@ -9,6 +9,9 @@ abstract class WatchlistLocalDataSource {
   Future<void> updateWatchStatus(String key, bool isWatched);
   Future<void> updateEpisodesWatched(String key, int episodesWatched);
   Future<bool> hasItems();
+  Future<int> getCachedVersion();
+  Future<void> setCachedVersion(int version);
+  Future<void> clearCache();
 }
 
 class WatchlistLocalDataSourceImpl implements WatchlistLocalDataSource {
@@ -97,5 +100,31 @@ class WatchlistLocalDataSourceImpl implements WatchlistLocalDataSource {
     } catch (_) {
       return false;
     }
+  }
+
+  @override
+  Future<int> getCachedVersion() async {
+    try {
+      final box = await Hive.openBox<int>('app_metadata');
+      return box.get('watchlist_version', defaultValue: 0) ?? 0;
+    } catch (_) {
+      return 0;
+    }
+  }
+
+  @override
+  Future<void> setCachedVersion(int version) async {
+    try {
+      final box = await Hive.openBox<int>('app_metadata');
+      await box.put('watchlist_version', version);
+    } catch (_) {}
+  }
+
+  @override
+  Future<void> clearCache() async {
+    try {
+      final box = await _box;
+      await box.clear();
+    } catch (_) {}
   }
 }

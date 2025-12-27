@@ -56,9 +56,11 @@ class ProgressHeader extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      '${progress.hoursRemaining.toStringAsFixed(0)}h remaining',
+                      '${progress.hoursRemaining.toStringAsFixed(0)}h '
+                      'remaining',
                       style: theme.textTheme.bodySmall?.copyWith(
-                        color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                        color: theme.colorScheme.onSurface
+                            .withValues(alpha: 0.7),
                       ),
                     ),
                   ],
@@ -66,9 +68,13 @@ class ProgressHeader extends StatelessWidget {
               ),
               if (streak > 0)
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 8,
+                  ),
                   decoration: BoxDecoration(
-                    color: theme.colorScheme.tertiary.withValues(alpha: 0.2),
+                    color:
+                        theme.colorScheme.tertiary.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Row(

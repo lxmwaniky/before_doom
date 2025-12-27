@@ -59,7 +59,14 @@ class CountdownView extends StatelessWidget {
                       :final minutes,
                       :final seconds
                     ) =>
-                      _buildCountdown(theme, size, days, hours, minutes, seconds),
+                      _buildCountdown(
+                        theme,
+                        size,
+                        days,
+                        hours,
+                        minutes,
+                        seconds,
+                      ),
                   };
                 },
               ),
@@ -267,7 +274,8 @@ class CountdownView extends StatelessWidget {
               ),
               const SizedBox(height: 8),
               Text(
-                'Track your rewatches, discover post-credits scenes,\nand prepare for what comes next.',
+                'Track your rewatches, discover post-credits '
+                'scenes,\nand prepare for what comes next.',
                 textAlign: TextAlign.center,
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: theme.colorScheme.onSurface.withValues(alpha: 0.6),

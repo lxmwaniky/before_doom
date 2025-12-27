@@ -106,7 +106,10 @@ class ShareProgressCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 _buildStat('${progress.watchedItems}', 'Watched'),
-                _buildStat('${progress.totalItems - progress.watchedItems}', 'Remaining'),
+                _buildStat(
+                  '${progress.totalItems - progress.watchedItems}',
+                  'Remaining',
+                ),
                 _buildStat('$daysRemaining', 'Days Left'),
               ],
             ),

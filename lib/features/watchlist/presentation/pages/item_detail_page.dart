@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
+import '../../../../core/widgets/completion_share_dialog.dart';
 import '../../domain/entities/movie.dart';
 
 class ItemDetailPage extends StatefulWidget {
@@ -87,7 +88,9 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
                     Text(
                       item.overview!,
                       style: theme.textTheme.bodyMedium?.copyWith(
-                        color: theme.colorScheme.onSurface.withValues(alpha: 0.8),
+                        color: theme.colorScheme.onSurface.withValues(
+                          alpha: 0.8,
+                        ),
                         height: 1.5,
                       ),
                     ),
@@ -226,8 +229,17 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
       width: double.infinity,
       child: FilledButton.icon(
         onPressed: () {
+          final wasNotWatched = !_isWatched;
           setState(() => _isWatched = !_isWatched);
           widget.onToggle();
+          if (wasNotWatched) {
+            CompletionShareDialog.show(
+              context,
+              title: widget.item.title,
+              isTvShow: widget.item.isTvShow,
+              season: widget.item.season,
+            );
+          }
         },
         icon: Icon(_isWatched ? Icons.check_circle : Icons.circle_outlined),
         label: Text(_isWatched ? 'Watched' : 'Mark as Watched'),
@@ -254,10 +266,7 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
       ),
       child: Row(
         children: [
-          Icon(
-            Icons.schedule,
-            color: theme.colorScheme.tertiary,
-          ),
+          Icon(Icons.schedule, color: theme.colorScheme.tertiary),
           const SizedBox(width: 12),
           Expanded(
             child: Text(
@@ -275,8 +284,9 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
 
   Widget _buildRelatedItems(ThemeData theme, WatchlistItem item) {
     final related = widget.allItems
-        .where((i) =>
-            i.watchPath == item.watchPath && i.uniqueKey != item.uniqueKey)
+        .where(
+          (i) => i.watchPath == item.watchPath && i.uniqueKey != item.uniqueKey,
+        )
         .toList();
 
     if (related.isEmpty) return const SizedBox.shrink();
