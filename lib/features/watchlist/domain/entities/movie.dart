@@ -79,6 +79,10 @@ class WatchlistItem extends HiveObject {
       ? 'https://image.tmdb.org/t/p/w500$posterPath'
       : '';
 
+  String get fullPosterUrlHD => posterPath != null
+      ? 'https://image.tmdb.org/t/p/w780$posterPath'
+      : '';
+
   String get displayTitle =>
       season != null ? '$title (Season $season)' : title;
 

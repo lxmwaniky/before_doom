@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
+import '../../../../core/util/haptic_service.dart';
 import '../../domain/entities/movie.dart';
 import '../pages/item_detail_page.dart';
 
@@ -8,12 +9,14 @@ class WatchlistCard extends StatelessWidget {
   final WatchlistItem item;
   final VoidCallback onToggle;
   final ValueChanged<int>? onEpisodesChanged;
+  final List<WatchlistItem> allItems;
 
   const WatchlistCard({
     super.key,
     required this.item,
     required this.onToggle,
     this.onEpisodesChanged,
+    this.allItems = const [],
   });
 
   @override
@@ -48,7 +51,14 @@ class WatchlistCard extends StatelessWidget {
                 ),
                 if (!item.comingSoon)
                   GestureDetector(
-                    onTap: onToggle,
+                    onTap: () {
+                      if (!item.isWatched) {
+                        HapticService.missionComplete();
+                      } else {
+                        HapticService.lightTap();
+                      }
+                      onToggle();
+                    },
                     child: Padding(
                       padding: const EdgeInsets.all(12),
                       child: Icon(
@@ -78,6 +88,7 @@ class WatchlistCard extends StatelessWidget {
           item: item,
           onToggle: onToggle,
           onEpisodesChanged: onEpisodesChanged,
+          allItems: allItems,
         ),
       ),
     );

@@ -7,12 +7,14 @@ class ItemDetailPage extends StatefulWidget {
   final WatchlistItem item;
   final VoidCallback onToggle;
   final ValueChanged<int>? onEpisodesChanged;
+  final List<WatchlistItem> allItems;
 
   const ItemDetailPage({
     super.key,
     required this.item,
     required this.onToggle,
     this.onEpisodesChanged,
+    this.allItems = const [],
   });
 
   @override
@@ -42,9 +44,9 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
             expandedHeight: 300,
             pinned: true,
             flexibleSpace: FlexibleSpaceBar(
-              background: item.fullPosterUrl.isNotEmpty
+              background: item.fullPosterUrlHD.isNotEmpty
                   ? CachedNetworkImage(
-                      imageUrl: item.fullPosterUrl,
+                      imageUrl: item.fullPosterUrlHD,
                       fit: BoxFit.cover,
                       colorBlendMode: BlendMode.darken,
                       color: Colors.black45,
@@ -97,6 +99,8 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
                   ],
                   if (!item.comingSoon) _buildWatchButton(theme),
                   if (item.comingSoon) _buildComingSoonMessage(theme),
+                  const SizedBox(height: 24),
+                  _buildRelatedItems(theme, item),
                 ],
               ),
             ),
@@ -186,20 +190,22 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
                   : null,
               icon: const Icon(Icons.remove),
             ),
-            const SizedBox(width: 24),
-            FilledButton.tonal(
-              onPressed: () {
-                setState(() {
-                  _episodesWatched = _episodesWatched < item.episodeCount
-                      ? _episodesWatched + 1
-                      : 0;
-                  _isWatched = _episodesWatched >= item.episodeCount;
-                });
-                widget.onEpisodesChanged?.call(_episodesWatched);
-              },
-              child: const Text('Mark Episode Watched'),
+            const SizedBox(width: 16),
+            Flexible(
+              child: FilledButton.tonal(
+                onPressed: () {
+                  setState(() {
+                    _episodesWatched = _episodesWatched < item.episodeCount
+                        ? _episodesWatched + 1
+                        : 0;
+                    _isWatched = _episodesWatched >= item.episodeCount;
+                  });
+                  widget.onEpisodesChanged?.call(_episodesWatched);
+                },
+                child: const Text('+1 Episode'),
+              ),
             ),
-            const SizedBox(width: 24),
+            const SizedBox(width: 16),
             IconButton.filled(
               onPressed: _episodesWatched < item.episodeCount
                   ? () {
@@ -263,6 +269,90 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildRelatedItems(ThemeData theme, WatchlistItem item) {
+    final related = widget.allItems
+        .where((i) =>
+            i.watchPath == item.watchPath && i.uniqueKey != item.uniqueKey)
+        .toList();
+
+    if (related.isEmpty) return const SizedBox.shrink();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Related',
+          style: theme.textTheme.titleMedium?.copyWith(
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        const SizedBox(height: 12),
+        SizedBox(
+          height: 180,
+          child: ListView.separated(
+            scrollDirection: Axis.horizontal,
+            itemCount: related.length,
+            separatorBuilder: (_, __) => const SizedBox(width: 12),
+            itemBuilder: (context, index) {
+              final relatedItem = related[index];
+              return _buildRelatedCard(theme, relatedItem);
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildRelatedCard(ThemeData theme, WatchlistItem relatedItem) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(
+            builder: (_) => ItemDetailPage(
+              item: relatedItem,
+              onToggle: () {},
+              allItems: widget.allItems,
+            ),
+          ),
+        );
+      },
+      child: SizedBox(
+        width: 100,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: relatedItem.fullPosterUrl.isNotEmpty
+                  ? CachedNetworkImage(
+                      imageUrl: relatedItem.fullPosterUrl,
+                      height: 140,
+                      width: 100,
+                      fit: BoxFit.cover,
+                    )
+                  : Container(
+                      height: 140,
+                      width: 100,
+                      color: theme.colorScheme.surfaceContainer,
+                      child: Icon(
+                        relatedItem.isTvShow ? Icons.tv : Icons.movie,
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              relatedItem.displayTitle,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: theme.textTheme.labelSmall,
+            ),
+          ],
+        ),
       ),
     );
   }
