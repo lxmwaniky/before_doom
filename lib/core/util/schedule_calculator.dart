@@ -33,7 +33,17 @@ class ScheduleCalculator {
     var currentBudget = currentMonthBudget;
 
     for (final item in unwatchedItems) {
-      final targetDate = DateTime(now.year, now.month + monthOffset, 1);
+      // Calculate target date properly handling year boundaries
+      var targetYear = now.year;
+      var targetMonthNum = now.month + monthOffset;
+      
+      // Handle month overflow into next years
+      while (targetMonthNum > 12) {
+        targetMonthNum -= 12;
+        targetYear++;
+      }
+      
+      final targetDate = DateTime(targetYear, targetMonthNum, 1);
       final targetMonth = _formatMonth(targetDate);
 
       result.add(item.copyWith(targetMonth: targetMonth));
