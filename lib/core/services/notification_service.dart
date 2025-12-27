@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:hive/hive.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
@@ -26,6 +27,16 @@ class NotificationService {
 
     try {
       tz.initializeTimeZones();
+      
+      // Set local timezone properly
+      final timezoneInfo = await FlutterTimezone.getLocalTimezone();
+      final timezoneName = timezoneInfo.toString();
+      try {
+        tz.setLocalLocation(tz.getLocation(timezoneName));
+      } catch (e) {
+        debugPrint('Timezone $timezoneName not found, using UTC');
+        tz.setLocalLocation(tz.UTC);
+      }
 
       const androidSettings =
           AndroidInitializationSettings('@mipmap/ic_launcher');
@@ -46,6 +57,7 @@ class NotificationService {
       );
 
       _isInitialized = result ?? false;
+      debugPrint('NotificationService initialized: $_isInitialized');
       return _isInitialized;
     } catch (e) {
       debugPrint('NotificationService.init failed: $e');
@@ -91,7 +103,10 @@ class NotificationService {
     try {
       if (!_isInitialized) {
         final initialized = await init();
-        if (!initialized) return false;
+        if (!initialized) {
+          debugPrint('Failed to initialize notifications');
+          return false;
+        }
       }
 
       await cancelReminder();
@@ -109,6 +124,8 @@ class NotificationService {
       if (scheduledDate.isBefore(now)) {
         scheduledDate = scheduledDate.add(const Duration(days: 1));
       }
+
+      debugPrint('Scheduling notification for: $scheduledDate');
 
       const title = 'Time to Watch!';
       final body = nextMovieTitle != null
@@ -128,6 +145,8 @@ class NotificationService {
             importance: Importance.high,
             priority: Priority.high,
             color: const Color(0xFFE23636),
+            playSound: true,
+            enableVibration: true,
           ),
           iOS: const DarwinNotificationDetails(
             presentAlert: true,
@@ -141,6 +160,7 @@ class NotificationService {
             UILocalNotificationDateInterpretation.absoluteTime,
       );
 
+      debugPrint('Notification scheduled successfully');
       await _saveReminderSettings(true, hour, minute);
       return true;
     } catch (e) {

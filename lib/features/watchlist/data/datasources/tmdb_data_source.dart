@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
@@ -18,14 +19,49 @@ class TmdbDataSourceImpl implements TmdbDataSource {
   static const _baseUrl = 'https://api.themoviedb.org/3';
   static const _timeout = Duration(seconds: 10);
 
+  // Remote watchlist URL - update this to your hosted JSON
+  static const _remoteWatchlistUrl =
+      'https://raw.githubusercontent.com/lxmwaniky/before_doom/main/assets/marvel_watchlist.json';
+
   TmdbDataSourceImpl({required this.client});
 
   String get _apiKey => dotenv.env['TMDB_API_KEY'] ?? '';
 
+  Future<Map<String, dynamic>> _loadWatchlistJson() async {
+    // Try to fetch from remote first for latest updates
+    try {
+      final response = await client
+          .get(Uri.parse(_remoteWatchlistUrl))
+          .timeout(const Duration(seconds: 5));
+
+      if (response.statusCode == 200) {
+        final remoteData = jsonDecode(response.body) as Map<String, dynamic>;
+        final localJson = await rootBundle.loadString(
+          'assets/marvel_watchlist.json',
+        );
+        final localData = jsonDecode(localJson) as Map<String, dynamic>;
+
+        final remoteVersion = remoteData['version'] as int? ?? 0;
+        final localVersion = localData['version'] as int? ?? 0;
+
+        // Use remote if it's newer
+        if (remoteVersion > localVersion) {
+          debugPrint('Using remote watchlist (v$remoteVersion)');
+          return remoteData;
+        }
+      }
+    } catch (e) {
+      debugPrint('Remote watchlist fetch failed, using local: $e');
+    }
+
+    // Fallback to local asset
+    final jsonStr = await rootBundle.loadString('assets/marvel_watchlist.json');
+    return jsonDecode(jsonStr) as Map<String, dynamic>;
+  }
+
   @override
   Future<int> getJsonVersion() async {
-    final jsonStr = await rootBundle.loadString('assets/marvel_watchlist.json');
-    final data = jsonDecode(jsonStr) as Map<String, dynamic>;
+    final data = await _loadWatchlistJson();
     return data['version'] as int? ?? 1;
   }
 
@@ -35,8 +71,7 @@ class TmdbDataSourceImpl implements TmdbDataSource {
       throw const ServerException('TMDB API key not configured');
     }
 
-    final jsonStr = await rootBundle.loadString('assets/marvel_watchlist.json');
-    final data = jsonDecode(jsonStr) as Map<String, dynamic>;
+    final data = await _loadWatchlistJson();
     final jsonItems = data['items'] as List;
 
     final futures = <Future<WatchlistItem?>>[];
