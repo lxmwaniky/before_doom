@@ -9,10 +9,8 @@ class WatchlistBloc extends Bloc<WatchlistEvent, WatchlistState> {
   final WatchlistRepository repository;
   final StreakService streakService;
 
-  WatchlistBloc({
-    required this.repository,
-    required this.streakService,
-  }) : super(const WatchlistInitial()) {
+  WatchlistBloc({required this.repository, required this.streakService})
+    : super(const WatchlistInitial()) {
     on<WatchlistLoadRequested>(_onLoadRequested);
     on<WatchlistItemToggled>(_onItemToggled);
     on<WatchlistEpisodesUpdated>(_onEpisodesUpdated);
@@ -35,11 +33,9 @@ class WatchlistBloc extends Bloc<WatchlistEvent, WatchlistState> {
 
         progressResult.fold(
           (failure) => emit(WatchlistError(failure.message)),
-          (progress) => emit(WatchlistLoaded(
-            items: items,
-            progress: progress,
-            streak: streak,
-          )),
+          (progress) => emit(
+            WatchlistLoaded(items: items, progress: progress, streak: streak),
+          ),
         );
       },
     );
@@ -80,11 +76,13 @@ class WatchlistBloc extends Bloc<WatchlistEvent, WatchlistState> {
 
         progressResult.fold(
           (failure) => emit(WatchlistError(failure.message)),
-          (progress) => emit(currentState.copyWith(
-            items: updatedItems,
-            progress: progress,
-            streak: streak,
-          )),
+          (progress) => emit(
+            currentState.copyWith(
+              items: updatedItems,
+              progress: progress,
+              streak: streak,
+            ),
+          ),
         );
       },
     );
@@ -125,11 +123,13 @@ class WatchlistBloc extends Bloc<WatchlistEvent, WatchlistState> {
 
         progressResult.fold(
           (failure) => emit(WatchlistError(failure.message)),
-          (progress) => emit(currentState.copyWith(
-            items: updatedItems,
-            progress: progress,
-            streak: streak,
-          )),
+          (progress) => emit(
+            currentState.copyWith(
+              items: updatedItems,
+              progress: progress,
+              streak: streak,
+            ),
+          ),
         );
       },
     );
@@ -142,9 +142,11 @@ class WatchlistBloc extends Bloc<WatchlistEvent, WatchlistState> {
     final currentState = state;
     if (currentState is! WatchlistLoaded) return;
 
-    emit(currentState.copyWith(
-      activeFilter: event.filter,
-      clearFilter: event.filter == null,
-    ));
+    emit(
+      currentState.copyWith(
+        activeFilter: event.filter,
+        clearFilter: event.filter == null,
+      ),
+    );
   }
 }

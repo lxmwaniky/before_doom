@@ -69,22 +69,18 @@ class WatchlistItem extends HiveObject {
     this.comingSoon = false,
   });
 
-  ContentType get type =>
-      contentType == 0 ? ContentType.movie : ContentType.tv;
+  ContentType get type => contentType == 0 ? ContentType.movie : ContentType.tv;
 
   bool get isMovie => contentType == 0;
   bool get isTvShow => contentType == 1;
 
-  String get fullPosterUrl => posterPath != null
-      ? 'https://image.tmdb.org/t/p/w500$posterPath'
-      : '';
+  String get fullPosterUrl =>
+      posterPath != null ? 'https://image.tmdb.org/t/p/w500$posterPath' : '';
 
-  String get fullPosterUrlHD => posterPath != null
-      ? 'https://image.tmdb.org/t/p/w780$posterPath'
-      : '';
+  String get fullPosterUrlHD =>
+      posterPath != null ? 'https://image.tmdb.org/t/p/w780$posterPath' : '';
 
-  String get displayTitle =>
-      season != null ? '$title (Season $season)' : title;
+  String get displayTitle => season != null ? '$title (Season $season)' : title;
 
   double get progress {
     if (isMovie) return isWatched ? 1.0 : 0.0;

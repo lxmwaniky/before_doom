@@ -24,8 +24,11 @@ class StreakServiceImpl implements StreakService {
 
       final now = DateTime.now();
       final today = DateTime(now.year, now.month, now.day);
-      final lastWatch =
-          DateTime(lastWatchDate.year, lastWatchDate.month, lastWatchDate.day);
+      final lastWatch = DateTime(
+        lastWatchDate.year,
+        lastWatchDate.month,
+        lastWatchDate.day,
+      );
 
       final difference = today.difference(lastWatch).inDays;
 
@@ -52,7 +55,10 @@ class StreakServiceImpl implements StreakService {
 
       if (lastWatchDate != null) {
         final lastWatch = DateTime(
-            lastWatchDate.year, lastWatchDate.month, lastWatchDate.day);
+          lastWatchDate.year,
+          lastWatchDate.month,
+          lastWatchDate.day,
+        );
         final difference = today.difference(lastWatch).inDays;
 
         if (difference == 0) {

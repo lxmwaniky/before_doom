@@ -39,11 +39,7 @@ class ProgressHeader extends StatelessWidget {
                   children: [
                     Row(
                       children: [
-                        Icon(
-                          _getStatusIcon(),
-                          color: progressColor,
-                          size: 20,
-                        ),
+                        Icon(_getStatusIcon(), color: progressColor, size: 20),
                         const SizedBox(width: 8),
                         Text(
                           _getStatusText(),
@@ -59,8 +55,9 @@ class ProgressHeader extends StatelessWidget {
                       '${progress.hoursRemaining.toStringAsFixed(0)}h '
                       'remaining',
                       style: theme.textTheme.bodySmall?.copyWith(
-                        color: theme.colorScheme.onSurface
-                            .withValues(alpha: 0.7),
+                        color: theme.colorScheme.onSurface.withValues(
+                          alpha: 0.7,
+                        ),
                       ),
                     ),
                   ],
@@ -73,8 +70,7 @@ class ProgressHeader extends StatelessWidget {
                     vertical: 8,
                   ),
                   decoration: BoxDecoration(
-                    color:
-                        theme.colorScheme.tertiary.withValues(alpha: 0.2),
+                    color: theme.colorScheme.tertiary.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Row(

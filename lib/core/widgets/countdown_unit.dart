@@ -4,11 +4,7 @@ class CountdownUnit extends StatelessWidget {
   final String value;
   final String label;
 
-  const CountdownUnit({
-    super.key,
-    required this.value,
-    required this.label,
-  });
+  const CountdownUnit({super.key, required this.value, required this.label});
 
   @override
   Widget build(BuildContext context) {

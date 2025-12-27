@@ -34,11 +34,7 @@ class ShareProgressCard extends StatelessWidget {
           gradient: const LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [
-              Color(0xFF1A1A2E),
-              Color(0xFF16213E),
-              Color(0xFF0F3460),
-            ],
+            colors: [Color(0xFF1A1A2E), Color(0xFF16213E), Color(0xFF0F3460)],
           ),
           borderRadius: BorderRadius.circular(20),
         ),
@@ -185,12 +181,11 @@ class ShareProgressCard extends StatelessWidget {
 }
 
 class ShareService {
-  static Future<void> shareProgress({
-    required GlobalKey repaintKey,
-  }) async {
+  static Future<void> shareProgress({required GlobalKey repaintKey}) async {
     try {
-      final boundary = repaintKey.currentContext?.findRenderObject()
-          as RenderRepaintBoundary?;
+      final boundary =
+          repaintKey.currentContext?.findRenderObject()
+              as RenderRepaintBoundary?;
       if (boundary == null) return;
 
       final image = await boundary.toImage(pixelRatio: 3.0);
@@ -202,10 +197,9 @@ class ShareService {
       final file = File('${tempDir.path}/mcu_progress.png');
       await file.writeAsBytes(bytes);
 
-      await Share.shareXFiles(
-        [XFile(file.path)],
-        text: 'My MCU Rewatch Progress - Road to Avengers: Doomsday! 🎬',
-      );
+      await Share.shareXFiles([
+        XFile(file.path),
+      ], text: 'My MCU Rewatch Progress - Road to Avengers: Doomsday! 🎬');
     } catch (e) {
       debugPrint('Share failed: $e');
     }

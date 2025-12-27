@@ -1,5 +1,1 @@
-enum WatchPath {
-  essential,
-  movies,
-  completionist,
-}
+enum WatchPath { essential, movies, completionist }

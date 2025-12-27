@@ -18,12 +18,7 @@ class FilterChips extends StatelessWidget {
       scrollDirection: Axis.horizontal,
       child: Row(
         children: [
-          _buildChip(
-            context: context,
-            label: 'All',
-            value: null,
-            theme: theme,
-          ),
+          _buildChip(context: context, label: 'All', value: null, theme: theme),
           const SizedBox(width: 8),
           _buildChip(
             context: context,

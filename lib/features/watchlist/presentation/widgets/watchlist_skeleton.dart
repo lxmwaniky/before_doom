@@ -15,11 +15,7 @@ class MovieCardSkeleton extends StatelessWidget {
         highlightColor: theme.colorScheme.surface,
         child: Row(
           children: [
-            Container(
-              width: 80,
-              height: 120,
-              color: Colors.white,
-            ),
+            Container(width: 80, height: 120, color: Colors.white),
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.all(12),

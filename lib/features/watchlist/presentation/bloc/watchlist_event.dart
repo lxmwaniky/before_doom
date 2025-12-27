@@ -13,10 +13,7 @@ class WatchlistItemToggled extends WatchlistEvent {
   final String key;
   final bool isWatched;
 
-  const WatchlistItemToggled({
-    required this.key,
-    required this.isWatched,
-  });
+  const WatchlistItemToggled({required this.key, required this.isWatched});
 }
 
 class WatchlistEpisodesUpdated extends WatchlistEvent {

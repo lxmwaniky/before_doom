@@ -62,8 +62,10 @@ class ScheduleCalculator {
     final daysRemaining = doomsday.difference(now).inDays;
 
     final unwatchedItems = items.where((i) => !i.isWatched).toList();
-    final totalUnwatchedMinutes =
-        unwatchedItems.fold(0, (sum, i) => sum + i.runtime);
+    final totalUnwatchedMinutes = unwatchedItems.fold(
+      0,
+      (sum, i) => sum + i.runtime,
+    );
 
     final itemsPerWeek = daysRemaining > 0
         ? unwatchedItems.length / (daysRemaining / 7.0)

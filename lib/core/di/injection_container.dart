@@ -14,17 +14,14 @@ final sl = GetIt.instance;
 Future<void> initDependencies() async {
   // BLoCs
   sl.registerFactory(() => CountdownBloc());
-  sl.registerFactory(() => WatchlistBloc(
-        repository: sl(),
-        streakService: sl(),
-      ));
+  sl.registerFactory(
+    () => WatchlistBloc(repository: sl(), streakService: sl()),
+  );
 
   // Repositories
   sl.registerLazySingleton<WatchlistRepository>(
-    () => WatchlistRepositoryImpl(
-      remoteDataSource: sl(),
-      localDataSource: sl(),
-    ),
+    () =>
+        WatchlistRepositoryImpl(remoteDataSource: sl(), localDataSource: sl()),
   );
 
   // Data sources
@@ -36,9 +33,7 @@ Future<void> initDependencies() async {
   );
 
   // Services
-  sl.registerLazySingleton<StreakService>(
-    () => StreakServiceImpl(),
-  );
+  sl.registerLazySingleton<StreakService>(() => StreakServiceImpl());
 
   // External
   sl.registerLazySingleton(() => http.Client());

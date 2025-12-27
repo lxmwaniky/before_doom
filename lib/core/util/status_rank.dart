@@ -36,12 +36,12 @@ enum StatusRank {
   double progressToNextRank(double currentProgress) {
     final next = nextRank;
     if (next == null) return 1.0;
-    
+
     final rangeStart = minProgress.toDouble();
     final rangeEnd = next.minProgress.toDouble();
     final progressInRange = currentProgress - rangeStart;
     final rangeSize = rangeEnd - rangeStart;
-    
+
     return (progressInRange / rangeSize).clamp(0.0, 1.0);
   }
 }
