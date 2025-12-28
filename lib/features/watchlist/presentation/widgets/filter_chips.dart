@@ -58,9 +58,9 @@ class FilterChips extends StatelessWidget {
       selected: isActive,
       onSelected: (_) => onFilterChanged(value),
       selectedColor: theme.colorScheme.primary,
-      checkmarkColor: Colors.white,
+      checkmarkColor: theme.colorScheme.onPrimary,
       labelStyle: TextStyle(
-        color: isActive ? Colors.white : theme.colorScheme.onSurface,
+        color: isActive ? theme.colorScheme.onPrimary : theme.colorScheme.onSurface,
       ),
       side: BorderSide(
         color: isActive

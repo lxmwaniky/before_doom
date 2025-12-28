@@ -4,6 +4,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../core/widgets/completion_share_dialog.dart';
 import '../../domain/entities/movie.dart';
+import '../widgets/episode_tracker_card.dart';
 
 class ItemDetailPage extends StatefulWidget {
   final WatchlistItem item;
@@ -51,7 +52,7 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
                       imageUrl: item.fullPosterUrlHD,
                       fit: BoxFit.cover,
                       colorBlendMode: BlendMode.darken,
-                      color: Colors.black45,
+                      color: Colors.black.withValues(alpha: 0.45),
                     )
                   : Container(
                       color: theme.colorScheme.surfaceContainer,
@@ -98,7 +99,17 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
                     const SizedBox(height: 24),
                   ],
                   if (item.isTvShow && !item.comingSoon) ...[
-                    _buildEpisodeTracker(theme, item),
+                    EpisodeTrackerCard(
+                      episodesWatched: _episodesWatched,
+                      totalEpisodes: item.episodeCount,
+                      onEpisodesChanged: (newValue) {
+                        setState(() {
+                          _episodesWatched = newValue;
+                          _isWatched = _episodesWatched >= item.episodeCount;
+                        });
+                        widget.onEpisodesChanged?.call(_episodesWatched);
+                      },
+                    ),
                     const SizedBox(height: 24),
                   ],
                   if (!item.comingSoon) ...[
@@ -151,83 +162,7 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
     );
   }
 
-  Widget _buildEpisodeTracker(ThemeData theme, WatchlistItem item) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              'Episode Progress',
-              style: theme.textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            Text(
-              '$_episodesWatched / ${item.episodeCount}',
-              style: theme.textTheme.titleMedium?.copyWith(
-                color: theme.colorScheme.primary,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 12),
-        ClipRRect(
-          borderRadius: BorderRadius.circular(8),
-          child: LinearProgressIndicator(
-            value: item.episodeCount > 0
-                ? _episodesWatched / item.episodeCount
-                : 0,
-            minHeight: 12,
-            backgroundColor: theme.colorScheme.surfaceContainer,
-            valueColor: AlwaysStoppedAnimation(theme.colorScheme.primary),
-          ),
-        ),
-        const SizedBox(height: 16),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            IconButton.filled(
-              onPressed: _episodesWatched > 0
-                  ? () {
-                      setState(() => _episodesWatched--);
-                      widget.onEpisodesChanged?.call(_episodesWatched);
-                    }
-                  : null,
-              icon: const Icon(Icons.remove),
-            ),
-            const SizedBox(width: 16),
-            Flexible(
-              child: FilledButton.tonal(
-                onPressed: () {
-                  setState(() {
-                    _episodesWatched = _episodesWatched < item.episodeCount
-                        ? _episodesWatched + 1
-                        : 0;
-                    _isWatched = _episodesWatched >= item.episodeCount;
-                  });
-                  widget.onEpisodesChanged?.call(_episodesWatched);
-                },
-                child: const Text('+1 Episode'),
-              ),
-            ),
-            const SizedBox(width: 16),
-            IconButton.filled(
-              onPressed: _episodesWatched < item.episodeCount
-                  ? () {
-                      setState(() => _episodesWatched++);
-                      widget.onEpisodesChanged?.call(_episodesWatched);
-                    }
-                  : null,
-              icon: const Icon(Icons.add),
-            ),
-          ],
-        ),
-      ],
-    );
-  }
+
 
   Widget _buildWatchNowButton(ThemeData theme, WatchlistItem item) {
     final mediaType = item.isMovie ? 'movie' : 'tv';
