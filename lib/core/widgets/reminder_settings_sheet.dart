@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../services/notification_service.dart';
@@ -35,6 +36,10 @@ class _ReminderSettingsSheetState extends State<ReminderSettingsSheet> {
   }
 
   Future<void> _toggleReminder(bool enabled) async {
+    setState(() {
+      _isEnabled = enabled;
+    });
+
     try {
       if (enabled) {
         final granted = await _notificationService.requestPermission();
@@ -46,6 +51,9 @@ class _ReminderSettingsSheetState extends State<ReminderSettingsSheet> {
               ),
             );
           }
+          setState(() {
+            _isEnabled = false;
+          });
           return;
         }
 
@@ -59,19 +67,23 @@ class _ReminderSettingsSheetState extends State<ReminderSettingsSheet> {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Failed to schedule reminder')),
           );
+          setState(() {
+            _isEnabled = false;
+          });
           return;
         }
       } else {
         await _notificationService.cancelReminder();
       }
-
-      setState(() => _isEnabled = enabled);
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(
           context,
         ).showSnackBar(const SnackBar(content: Text('Something went wrong')));
       }
+      setState(() {
+        _isEnabled = !enabled;
+      });
     }
   }
 
@@ -191,50 +203,12 @@ class _ReminderSettingsSheetState extends State<ReminderSettingsSheet> {
             ),
           ),
           const SizedBox(height: 16),
-          SizedBox(
-            width: double.infinity,
-            child: OutlinedButton.icon(
-              onPressed: _sendTestNotification,
-              icon: const Icon(Icons.notifications),
-              label: const Text('Send Test Notification'),
-            ),
-          ),
+
           const SizedBox(height: 24),
         ],
       ),
     );
   }
 
-  Future<void> _sendTestNotification() async {
-    try {
-      await _notificationService.init();
-      final granted = await _notificationService.requestPermission();
 
-      if (!granted) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Notification permission denied')),
-          );
-        }
-        return;
-      }
-
-      final success = await _notificationService.showTestNotification();
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              success ? 'Test notification sent!' : 'Failed to send',
-            ),
-          ),
-        );
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Error: $e')));
-      }
-    }
-  }
 }
