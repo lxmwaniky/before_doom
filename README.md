@@ -23,11 +23,34 @@ MCU rewatch tracker with countdown to **Avengers: Doomsday** (December 18, 2026)
 
 ## Getting Started
 
-```bash
-# Install dependencies
-fvm flutter pub get
+### Prerequisites
+- Flutter 3.35.2 (via FVM)
+- A TMDB API key (get one free at https://www.themoviedb.org/settings/api)
 
-# Run the app
+### Setup
+
+1. **Clone the repository**
+```bash
+git clone https://github.com/lxmwaniky/before_doom.git
+cd before_doom
+```
+
+2. **Set up environment variables**
+```bash
+# Copy the example file
+cp .env.example .env
+
+# Edit .env and add your TMDB API key
+# Required: TMDB_API_KEY
+```
+
+3. **Install dependencies**
+```bash
+fvm flutter pub get
+```
+
+4. **Run the app**
+```bash
 fvm flutter run
 ```
 
