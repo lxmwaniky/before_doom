@@ -1,5 +1,5 @@
 {
-    "version": 4,
+    "version": 5,
     "lastUpdated": "2025-12-28",
     "items": [
         {
@@ -847,13 +847,12 @@
             "comingSoon": true
         },
         {
-            "tmdbId": 0,
+            "tmdbId": 969681,
             "type": "movie",
             "title": "Spider-Man: Brand New Day",
             "targetMonth": "2026-12",
             "path": "movies",
-            "order": 105,
-            "comingSoon": true
+            "order": 105
         }
     ]
 }

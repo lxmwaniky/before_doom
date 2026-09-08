@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart' show ScrollCacheExtent;
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive/hive.dart';
 
@@ -211,7 +212,7 @@ class _WatchlistViewState extends State<WatchlistView> {
       physics: const BouncingScrollPhysics(
         parent: AlwaysScrollableScrollPhysics(),
       ),
-      cacheExtent: 500,
+      scrollCacheExtent: const ScrollCacheExtent.pixels(500),
       slivers: [
         SliverToBoxAdapter(
           child: Padding(
@@ -241,7 +242,7 @@ class _WatchlistViewState extends State<WatchlistView> {
       physics: const BouncingScrollPhysics(
         parent: AlwaysScrollableScrollPhysics(),
       ),
-      cacheExtent: 500,
+      scrollCacheExtent: const ScrollCacheExtent.pixels(500),
       slivers: [
         SliverToBoxAdapter(
           child: Padding(

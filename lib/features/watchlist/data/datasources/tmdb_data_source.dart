@@ -82,21 +82,20 @@ class TmdbDataSourceImpl implements TmdbDataSource {
       );
     }
 
+    final sourceMaps = <Map<String, dynamic>>[];
     final futures = <Future<WatchlistItem?>>[];
 
     for (final itemData in jsonItems) {
       if (itemData is! Map<String, dynamic>) continue;
-      
+
       final tmdbId = itemData['tmdbId'] as int? ?? 0;
       final type = itemData['type'] as String? ?? 'movie';
       final comingSoon = itemData['comingSoon'] == true;
 
+      sourceMaps.add(itemData);
       if (comingSoon || tmdbId == 0) {
         futures.add(Future.value(_createComingSoonItem(itemData)));
-        continue;
-      }
-
-      if (type == 'movie') {
+      } else if (type == 'movie') {
         futures.add(_fetchMovieDetails(itemData));
       } else {
         futures.add(_fetchTvDetails(itemData));
@@ -104,9 +103,27 @@ class TmdbDataSourceImpl implements TmdbDataSource {
     }
 
     final results = await Future.wait(futures, eagerError: false);
-    final items = results.whereType<WatchlistItem>().toList();
 
-    if (items.isEmpty) {
+    var fetchAttempts = 0;
+    var fetchSuccesses = 0;
+    final items = <WatchlistItem>[];
+    for (var i = 0; i < results.length; i++) {
+      final item = results[i];
+      final isComingSoon = sourceMaps[i]['comingSoon'] == true ||
+          (sourceMaps[i]['tmdbId'] as int? ?? 0) == 0;
+      if (!isComingSoon) fetchAttempts++;
+
+      if (item != null) {
+        if (!isComingSoon) fetchSuccesses++;
+        items.add(item);
+      } else {
+        // TMDB fetch failed; keep the item with metadata from the watchlist
+        // JSON so it (and any user progress keyed to it) isn't dropped.
+        items.add(_createFallbackItem(sourceMaps[i]));
+      }
+    }
+
+    if (fetchAttempts > 0 && fetchSuccesses == 0) {
       throw const ServerException(
         'Failed to fetch watchlist. Check your internet connection and TMDB API key.',
       );
@@ -130,6 +147,22 @@ class TmdbDataSourceImpl implements TmdbDataSource {
       contentType: itemData['type'] == 'movie' ? 0 : 1,
       season: itemData['season'] as int?,
       comingSoon: true,
+    );
+  }
+
+  WatchlistItem _createFallbackItem(Map<String, dynamic> itemData) {
+    return WatchlistItem(
+      tmdbId: itemData['tmdbId'] as int? ?? 0,
+      title: itemData['title'] as String? ?? 'Unknown',
+      runtime: 0,
+      posterPath: null,
+      overview: null,
+      releaseDate: '',
+      targetMonth: itemData['targetMonth'] as String,
+      watchPath: itemData['path'] as String,
+      order: itemData['order'] as int,
+      contentType: (itemData['type'] as String? ?? 'movie') == 'movie' ? 0 : 1,
+      season: itemData['season'] as int?,
     );
   }
 

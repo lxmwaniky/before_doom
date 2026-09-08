@@ -31,10 +31,6 @@ class WatchlistRepositoryImpl implements WatchlistRepository {
         return Right(cachedItems);
       }
 
-      if (cachedVersion != jsonVersion) {
-        await localDataSource.clearCache();
-      }
-
       final remoteItems = await remoteDataSource.getWatchlist();
       await localDataSource.cacheItems(remoteItems);
       await localDataSource.setCachedVersion(jsonVersion);
@@ -65,12 +61,6 @@ class WatchlistRepositoryImpl implements WatchlistRepository {
   Future<void> _refreshFromRemote() async {
     try {
       final jsonVersion = await remoteDataSource.getJsonVersion();
-      final cachedVersion = await localDataSource.getCachedVersion();
-
-      if (cachedVersion != jsonVersion) {
-        await localDataSource.clearCache();
-      }
-
       final remoteItems = await remoteDataSource.getWatchlist();
       await localDataSource.cacheItems(remoteItems);
       await localDataSource.setCachedVersion(jsonVersion);

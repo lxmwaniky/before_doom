@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart' show ScrollCacheExtent;
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../domain/entities/movie.dart';
@@ -50,7 +51,7 @@ class WatchlistSearchResults extends StatelessWidget {
       physics: const BouncingScrollPhysics(
         parent: AlwaysScrollableScrollPhysics(),
       ),
-      cacheExtent: 500,
+      scrollCacheExtent: const ScrollCacheExtent.pixels(500),
       padding: const EdgeInsets.all(16),
       itemCount: filtered.length,
       itemBuilder: (context, index) {

@@ -11,7 +11,6 @@ abstract class WatchlistLocalDataSource {
   Future<bool> hasItems();
   Future<int> getCachedVersion();
   Future<void> setCachedVersion(int version);
-  Future<void> clearCache();
 }
 
 class WatchlistLocalDataSourceImpl implements WatchlistLocalDataSource {
@@ -37,21 +36,18 @@ class WatchlistLocalDataSourceImpl implements WatchlistLocalDataSource {
     try {
       final box = await _box;
 
-      final existingProgress = <String, Map<String, dynamic>>{};
-      for (final item in box.values) {
-        existingProgress[item.uniqueKey] = {
-          'isWatched': item.isWatched,
-          'episodesWatched': item.episodesWatched,
-        };
-      }
-
-      await box.clear();
+      // Upsert instead of clear-and-rewrite so user progress is never
+      // deleted, even transiently (e.g. if the app dies mid-write).
+      final newKeys = items.map((i) => i.uniqueKey).toSet();
+      final staleKeys =
+          box.keys.where((key) => !newKeys.contains(key)).toList();
+      await box.deleteAll(staleKeys);
 
       for (final item in items) {
-        final existing = existingProgress[item.uniqueKey];
+        final existing = box.get(item.uniqueKey);
         if (existing != null) {
-          item.isWatched = existing['isWatched'] as bool;
-          item.episodesWatched = existing['episodesWatched'] as int;
+          item.isWatched = existing.isWatched;
+          item.episodesWatched = existing.episodesWatched;
         }
         await box.put(item.uniqueKey, item);
       }
@@ -117,14 +113,6 @@ class WatchlistLocalDataSourceImpl implements WatchlistLocalDataSource {
     try {
       final box = await Hive.openBox<int>('app_metadata');
       await box.put('watchlist_version', version);
-    } catch (_) {}
-  }
-
-  @override
-  Future<void> clearCache() async {
-    try {
-      final box = await _box;
-      await box.clear();
     } catch (_) {}
   }
 }
