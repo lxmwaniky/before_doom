@@ -1,0 +1,75 @@
+name: Deploy to Play Store
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+  workflow_dispatch: {}
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+
+      - name: Create Production .env
+        run: |
+          cat <<EOF > .env
+          TMDB_API_KEY=${{ secrets.TMDB_API_KEY }}
+          EOF
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Analyze
+        run: flutter analyze
+
+      - name: Run tests
+        run: flutter test
+
+      - name: Decode keystore
+        run: |
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > android/upload-keystore.jks
+
+      - name: Create key.properties
+        run: |
+          cat <<EOF > android/key.properties
+          storePassword=${{ secrets.KEYSTORE_PASSWORD }}
+          keyPassword=${{ secrets.KEY_PASSWORD }}
+          keyAlias=${{ secrets.KEY_ALIAS }}
+          storeFile=../upload-keystore.jks
+          EOF
+
+      - name: Build App Bundle
+        run: flutter build appbundle --release
+
+      - name: Decode Play Service Account
+        run: |
+          echo "${{ secrets.PLAY_STORE_SERVICE_ACCOUNT_JSON }}" | base64 --decode > android/play-service-account.json
+
+      - name: Upload to Google Play
+        uses: r0adkll/upload-google-play@v1
+        with:
+          serviceAccountJson: android/play-service-account.json
+          packageName: com.lxmwaniky.doom
+          releaseFiles: build/app/outputs/bundle/release/app-release.aab
+          tracks: internal
+          status: completed
+
+      - name: Clean up secrets from runner
+        if: always()
+        run: |
+          rm -f android/upload-keystore.jks android/key.properties android/play-service-account.json .env
