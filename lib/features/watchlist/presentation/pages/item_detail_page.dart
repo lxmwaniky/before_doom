@@ -272,7 +272,7 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
           child: ListView.separated(
             scrollDirection: Axis.horizontal,
             itemCount: related.length,
-            separatorBuilder: (_, __) => const SizedBox(width: 12),
+            separatorBuilder: (_, _) => const SizedBox(width: 12),
             itemBuilder: (context, index) {
               final relatedItem = related[index];
               return _buildRelatedCard(theme, relatedItem);

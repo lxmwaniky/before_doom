@@ -84,9 +84,13 @@ class _CompletionShareDialogState extends State<CompletionShareDialog> {
 
       if (mounted) Navigator.pop(context);
 
-      await Share.shareXFiles([
-        XFile(file.path),
-      ], text: 'Just finished $_displayTitle! #BeforeDoom #Doomsday\n\nTrack your MCU journey: https://play.google.com/store/apps/details?id=com.lxmwaniky.doom');
+      await SharePlus.instance.share(
+        ShareParams(
+          files: [XFile(file.path)],
+          text:
+              'Just finished $_displayTitle! #BeforeDoom #Doomsday\n\nTrack your MCU journey: https://play.google.com/store/apps/details?id=com.lxmwaniky.doom',
+        ),
+      );
     } catch (e) {
       debugPrint('Share failed: $e');
     } finally {
@@ -136,7 +140,7 @@ class _CompletionShareDialogState extends State<CompletionShareDialog> {
                         width: 100,
                         height: 150,
                         fit: BoxFit.cover,
-                        errorWidget: (_, __, ___) => Container(
+                        errorWidget: (_, _, _) => Container(
                           width: 100,
                           height: 150,
                           color: Colors.grey[800],

@@ -197,9 +197,13 @@ class ShareService {
       final file = File('${tempDir.path}/mcu_progress.png');
       await file.writeAsBytes(bytes);
 
-      await Share.shareXFiles([
-        XFile(file.path),
-      ], text: 'My MCU Rewatch Progress - Road to Avengers: Doomsday!\n\nTrack your journey: https://play.google.com/store/apps/details?id=com.lxmwaniky.doom');
+      await SharePlus.instance.share(
+        ShareParams(
+          files: [XFile(file.path)],
+          text:
+              'My MCU Rewatch Progress - Road to Avengers: Doomsday!\n\nTrack your journey: https://play.google.com/store/apps/details?id=com.lxmwaniky.doom',
+        ),
+      );
     } catch (e) {
       debugPrint('Share failed: $e');
     }

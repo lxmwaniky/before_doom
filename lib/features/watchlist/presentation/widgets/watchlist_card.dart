@@ -115,9 +115,9 @@ class WatchlistCard extends StatelessWidget {
           ? CachedNetworkImage(
               imageUrl: item.fullPosterUrl,
               fit: BoxFit.cover,
-              placeholder: (_, __) =>
+              placeholder: (_, _) =>
                   Container(color: theme.colorScheme.surfaceContainer),
-              errorWidget: (_, __, ___) => _buildPlaceholder(theme),
+              errorWidget: (_, _, _) => _buildPlaceholder(theme),
             )
           : _buildPlaceholder(theme),
     );

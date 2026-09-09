@@ -10,8 +10,11 @@ import 'package:http/testing.dart';
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  setUp(() {
-    dotenv.testLoad(fileInput: 'TMDB_API_KEY=test-key');
+  setUp(() async {
+    await dotenv.load(
+      isOptional: true,
+      mergeWith: const {'TMDB_API_KEY': 'test-key'},
+    );
   });
 
   // Remote watchlist with a version far above the bundled asset's, so the

@@ -53,7 +53,7 @@ class NotificationService {
       );
 
       final result = await _notifications.initialize(
-        initSettings,
+        settings: initSettings,
         onDidReceiveNotificationResponse: _onNotificationTapped,
       );
 
@@ -146,11 +146,11 @@ class NotificationService {
           : 'Your MCU rewatch awaits. Doomsday is coming!';
 
       await _notifications.zonedSchedule(
-        0,
-        title,
-        body,
-        scheduledDate,
-        NotificationDetails(
+        id: 0,
+        title: title,
+        body: body,
+        scheduledDate: scheduledDate,
+        notificationDetails: NotificationDetails(
           android: AndroidNotificationDetails(
             'watch_reminder',
             'Watch Reminders',
@@ -169,8 +169,6 @@ class NotificationService {
         ),
         androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
         matchDateTimeComponents: DateTimeComponents.time,
-        uiLocalNotificationDateInterpretation:
-            UILocalNotificationDateInterpretation.absoluteTime,
       );
 
       debugPrint('Notification scheduled successfully');
@@ -185,7 +183,7 @@ class NotificationService {
   Future<bool> cancelReminder() async {
     try {
       if (_isInitialized) {
-        await _notifications.cancel(0);
+        await _notifications.cancel(id: 0);
       }
       await _saveReminderSettings(false, 0, 0);
       return true;
@@ -228,10 +226,10 @@ class NotificationService {
       }
 
       await _notifications.show(
-        99,
-        'Test Notification',
-        'Watch reminders are working!',
-        NotificationDetails(
+        id: 99,
+        title: 'Test Notification',
+        body: 'Watch reminders are working!',
+        notificationDetails: NotificationDetails(
           android: AndroidNotificationDetails(
             'watch_reminder',
             'Watch Reminders',
