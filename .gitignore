@@ -51,3 +51,5 @@ app.*.map.json
 .env
 .env.local
 .env.*.local
+# Imported reference project for stack comparison, not part of the app
+deni/
